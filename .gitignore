@@ -1,0 +1,46 @@
+# Dossiers et fichiers node_modules (backend et frontend)
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Fichiers IDE
+.idea/
+.vscode/
+*.iml
+
+# Fichiers environnement
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Fichiers système
+.DS_Store
+
+# Dossiers de build et cache
+build/
+dist/
+.cache/
+
+# Couverture de test
+coverage/
+
+# Binaires et dossiers temporaires
+bin/
+tmp/
+temp/
+
+# Mac OS files
+.AppleDouble
+.LSOverride
+
+# Surtout si tu utilises React, Angular ou autre framework frontend
+# Ajouter les dossiers de build spécifiques si besoin
+
+# Autres fichiers temporaires
+*.swp
+*~
