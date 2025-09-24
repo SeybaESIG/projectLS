@@ -1,9 +1,31 @@
-import { DataTypes } from 'sequelize';
+import {
+    DataTypes,
+    Model,
+    type InferAttributes,
+    type InferCreationAttributes,
+    type CreationOptional,
+    type ForeignKey,
+} from 'sequelize';
 import sequelize from '../config/db.js';
 
-// Modèle: tb_annonces
-export const Annonce = sequelize.define(
-    'Annonce',
+// Modèle: tb_annonces (classe typée)
+export class Annonce extends Model<InferAttributes<Annonce>, InferCreationAttributes<Annonce>> {
+    declare id_annon: CreationOptional<number>;
+    declare id_util: ForeignKey<number>;
+    declare id_ville_dep: number;
+    declare id_aerodep: number;
+    declare id_ville_arr: number;
+    declare id_aeroarr: number;
+    declare description: string | null;
+    declare prix: string;
+    declare datedepart: Date | null;
+    declare datearrivee: Date | null;
+    declare datepublication: Date | null;
+    declare statut: string | null;
+    declare titre: string | null;
+}
+
+Annonce.init(
     {
         id_annon: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         id_util: { type: DataTypes.INTEGER, allowNull: false },
@@ -19,7 +41,7 @@ export const Annonce = sequelize.define(
         statut: { type: DataTypes.STRING(50), allowNull: true },
         titre: { type: DataTypes.STRING(100), allowNull: true },
     },
-    { timestamps: false, tableName: 'tb_annonces' }
+    { sequelize, timestamps: false, tableName: 'tb_annonces' }
 );
 
 
