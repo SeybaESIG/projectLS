@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 import { Utilisateur, Role, Ville } from '../models/index.js';
+import bcrypt from 'bcrypt';
 
-// Contrôleur Utilisateurs: CRUD basique
-
+// Récupérer tous les utilisateurs avec leurs rôles et villes associés
 export async function listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const users = await Utilisateur.findAll({ include: [Role, Ville] });
@@ -12,6 +12,7 @@ export async function listUsers(req: Request, res: Response, next: NextFunction)
     }
 }
 
+// Récupérer un utilisateur par ID avec rôle et ville associés
 export async function getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const id = Number(req.params['id']);
@@ -26,6 +27,7 @@ export async function getUserById(req: Request, res: Response, next: NextFunctio
     }
 }
 
+// Créer un nouvel utilisateur
 export async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const {
@@ -53,7 +55,7 @@ export async function createUser(req: Request, res: Response, next: NextFunction
             prenom,
             email: email ?? null,
             tel: tel ?? null,
-            mot_de_passe,
+            mot_de_passe: hashedPassword,
             piece_id: piece_id ?? null,
             photo: photo ?? null,
             adresse: adresse ?? null,
@@ -65,6 +67,7 @@ export async function createUser(req: Request, res: Response, next: NextFunction
     }
 }
 
+// Mettre à jour un utilisateur existant
 export async function updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const id = Number(req.params['id']);
@@ -82,6 +85,7 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
     }
 }
 
+// Supprimer un utilisateur
 export async function deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const id = Number(req.params['id']);
@@ -95,5 +99,3 @@ export async function deleteUser(req: Request, res: Response, next: NextFunction
         next(err);
     }
 }
-
-

@@ -1,9 +1,26 @@
-import { DataTypes } from 'sequelize';
+import {
+    DataTypes,
+    Model,
+    type InferAttributes,
+    type InferCreationAttributes,
+    type CreationOptional,
+    type ForeignKey,
+} from 'sequelize';
 import sequelize from '../config/db.js';
 
-// Modèle: tb_historique_abonnements
-export const HistoriqueAbonnement = sequelize.define(
-    'HistoriqueAbonnement',
+// Classe représentant un historique d'abonnement
+export class HistoriqueAbonnement extends Model<InferAttributes<HistoriqueAbonnement>, InferCreationAttributes<HistoriqueAbonnement>> {
+    declare id_histo_abo: CreationOptional<number>;
+    declare id_type_abonnement: ForeignKey<number>;
+    declare nom_type: string;
+    declare prix: string;
+    declare duree_mois: number;
+    declare description: string | null;
+    declare action_histo: string;
+}
+
+// Initialisation du modèle
+HistoriqueAbonnement.init(
     {
         id_histo_abo: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         id_type_abonnement: { type: DataTypes.INTEGER, allowNull: false },
@@ -13,7 +30,5 @@ export const HistoriqueAbonnement = sequelize.define(
         description: { type: DataTypes.TEXT, allowNull: true },
         action_histo: { type: DataTypes.STRING(10), allowNull: false },
     },
-    { timestamps: false, tableName: 'tb_historique_abonnements' }
+    { sequelize, timestamps: false, tableName: 'tb_historique_abonnements' }
 );
-
-

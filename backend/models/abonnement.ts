@@ -8,7 +8,7 @@ import {
 } from 'sequelize';
 import sequelize from '../config/db.js';
 
-// Modèle: tb_abonnements (classe typée)
+// Modèle: tb_abonnements
 export class Abonnement extends Model<InferAttributes<Abonnement>, InferCreationAttributes<Abonnement>> {
     declare id_abonnement: CreationOptional<number>;
     declare id_util: ForeignKey<number>;
@@ -17,6 +17,7 @@ export class Abonnement extends Model<InferAttributes<Abonnement>, InferCreation
     declare date_fin: Date;
 }
 
+// Initialisation du modèle
 Abonnement.init(
     {
         id_abonnement: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },

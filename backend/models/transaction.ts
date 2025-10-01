@@ -9,9 +9,8 @@ import {
 } from 'sequelize';
 import sequelize from '../config/db.js';
 import type { Utilisateur } from './user.js';
-// Pas d'import de type de Annonce; utiliser un type primitif pour FK
 
-// Modèle: tb_transactions (classe typée)
+// Classe représentant une transaction
 export class Transaction extends Model<InferAttributes<Transaction>, InferCreationAttributes<Transaction>> {
     declare id_transa: CreationOptional<number>;
     declare id_payeur: ForeignKey<Utilisateur['id_util']>;
@@ -21,10 +20,12 @@ export class Transaction extends Model<InferAttributes<Transaction>, InferCreati
     declare statut: string;
     declare date: Date | null;
 
+    // Associations optionnelles
     declare payeur?: NonAttribute<Utilisateur>;
     declare receveur?: NonAttribute<Utilisateur>;
 }
 
+// Initialisation du modèle
 Transaction.init(
     {
         id_transa: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -37,5 +38,4 @@ Transaction.init(
     },
     { sequelize, timestamps: false, tableName: 'tb_transactions' }
 );
-
 

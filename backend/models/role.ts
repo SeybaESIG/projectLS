@@ -1,8 +1,14 @@
-import { DataTypes, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type NonAttribute } from 'sequelize';
+import { DataTypes,
+    Model,
+    type InferAttributes,
+    type InferCreationAttributes,
+    type CreationOptional,
+    type NonAttribute
+} from 'sequelize';
 import sequelize from '../config/db.js';
 import type { Utilisateur } from './user.js';
 
-// Modèle: tb_roles (classe typée)
+// Modèle: tb_roles
 export class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
     declare id_role: CreationOptional<number>;
     declare nom_role: string;

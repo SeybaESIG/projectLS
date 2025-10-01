@@ -7,7 +7,7 @@ import {
     deleteUser,
     getUsersByRole,
     getUsersByVille
-} from '../controllers/usersController.js';
+} from '../controllers/usersControllers.js';
 
 const router = Router();
 

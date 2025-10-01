@@ -1,9 +1,32 @@
-import { DataTypes } from 'sequelize';
+import {
+    DataTypes,
+    Model,
+    type InferAttributes,
+    type InferCreationAttributes,
+    type CreationOptional,
+    type ForeignKey,
+} from 'sequelize';
 import sequelize from '../config/db.js';
 
-// Modèle: tb_historique_annonces
-export const HistoriqueAnnonce = sequelize.define(
-    'HistoriqueAnnonce',
+// Classe représentant un historique d'annonce
+export class HistoriqueAnnonce extends Model<InferAttributes<HistoriqueAnnonce>, InferCreationAttributes<HistoriqueAnnonce>> {
+    declare id_histo_annon: CreationOptional<number>;
+    declare id_annon: ForeignKey<number>;
+    declare id_util: ForeignKey<number>;
+    declare id_aerodep: ForeignKey<number>;
+    declare id_aeroarr: ForeignKey<number>;
+    declare description: string | null;
+    declare prix: string;
+    declare datedepart: Date | null;
+    declare datearrivee: Date | null;
+    declare datepublication: Date | null;
+    declare statut: string | null;
+    declare titre: string | null;
+    declare action_histo: string;
+}
+
+// Initialisation du modèle
+HistoriqueAnnonce.init(
     {
         id_histo_annon: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         id_annon: { type: DataTypes.INTEGER, allowNull: false },
@@ -19,7 +42,5 @@ export const HistoriqueAnnonce = sequelize.define(
         titre: { type: DataTypes.STRING(100), allowNull: true },
         action_histo: { type: DataTypes.STRING(10), allowNull: false },
     },
-    { timestamps: false, tableName: 'tb_historique_annonces' }
+    { sequelize, timestamps: false, tableName: 'tb_historique_annonces' }
 );
-
-

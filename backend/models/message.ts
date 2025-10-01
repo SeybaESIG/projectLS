@@ -9,9 +9,8 @@ import {
 } from 'sequelize';
 import sequelize from '../config/db.js';
 import type { Utilisateur } from './user.js';
-// Pas d'import de type de Annonce; utiliser un type primitif pour FK
 
-// Modèle: tb_messages (classe typée)
+// Modèle: tb_messages
 export class Message extends Model<InferAttributes<Message>, InferCreationAttributes<Message>> {
     declare id_msg: CreationOptional<number>;
     declare id_expediteur: ForeignKey<Utilisateur['id_util']>;
@@ -24,6 +23,7 @@ export class Message extends Model<InferAttributes<Message>, InferCreationAttrib
     declare destinataire?: NonAttribute<Utilisateur>;
 }
 
+// Initialisation du modèle
 Message.init(
     {
         id_msg: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },

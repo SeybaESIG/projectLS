@@ -1,13 +1,14 @@
 import { DataTypes, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional } from 'sequelize';
 import sequelize from '../config/db.js';
 
-// Modèle: tb_pays (classe typée)
+// Modèle: tb_pays
 export class Pays extends Model<InferAttributes<Pays>, InferCreationAttributes<Pays>> {
     declare id_pays: CreationOptional<number>;
     declare nom_pays: string;
     declare code_iso_pays: string | null;
 }
 
+// Initialisation du modèle
 Pays.init(
     {
         id_pays: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },

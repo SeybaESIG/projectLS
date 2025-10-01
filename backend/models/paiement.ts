@@ -10,6 +10,7 @@ export class Paiement extends Model<InferAttributes<Paiement>, InferCreationAttr
     declare date: Date | null;
 }
 
+// Initialisation du modèle
 Paiement.init(
     {
         id_paie: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },

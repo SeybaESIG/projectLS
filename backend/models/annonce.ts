@@ -8,7 +8,7 @@ import {
 } from 'sequelize';
 import sequelize from '../config/db.js';
 
-// Modèle: tb_annonces (classe typée)
+// Modèle: tb_annonces
 export class Annonce extends Model<InferAttributes<Annonce>, InferCreationAttributes<Annonce>> {
     declare id_annon: CreationOptional<number>;
     declare id_util: ForeignKey<number>;
@@ -25,6 +25,7 @@ export class Annonce extends Model<InferAttributes<Annonce>, InferCreationAttrib
     declare titre: string | null;
 }
 
+// Initialisation du modèle
 Annonce.init(
     {
         id_annon: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },

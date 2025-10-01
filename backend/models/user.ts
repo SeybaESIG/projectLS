@@ -13,7 +13,7 @@ import type { Ville } from './ville.js';
 import type { Message } from './message.js';
 import type { Transaction } from './transaction.js';
 
-// Modèle: tb_utilisateurs (classe avec typage fort)
+// Modèle: tb_utilisateurs
 export class Utilisateur extends Model<InferAttributes<Utilisateur>, InferCreationAttributes<Utilisateur>> {
     declare id_util: CreationOptional<number>;
     declare id_ville: ForeignKey<Ville['id_ville']>;
@@ -30,7 +30,7 @@ export class Utilisateur extends Model<InferAttributes<Utilisateur>, InferCreati
     declare adresse: string | null;
     declare detail_adresse: string | null;
 
-    // Champs d'association (non persistés)
+    // Champs d'association
     declare Role?: NonAttribute<Role>;
     declare Ville?: NonAttribute<Ville>;
     declare messagesExpedies?: NonAttribute<Message[]>;
@@ -39,6 +39,7 @@ export class Utilisateur extends Model<InferAttributes<Utilisateur>, InferCreati
     declare transactionsReceveur?: NonAttribute<Transaction[]>;
 }
 
+// Initialisation du modèle
 Utilisateur.init(
     {
         id_util: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
