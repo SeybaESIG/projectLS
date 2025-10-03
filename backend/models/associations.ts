@@ -13,6 +13,7 @@ import { Transaction } from './transaction.js';
 import { Paiement } from './paiement.js';
 import { Evaluation } from './evaluation.js';
 import { HistoriqueAnnonce } from './historiqueAnnonce.js';
+import { Achat } from './achat.js';
 
 export function initAssociations(): void {
     // Utilisateur -> Role, Ville

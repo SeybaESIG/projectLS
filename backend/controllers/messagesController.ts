@@ -27,8 +27,8 @@ export const getMessageById = async (req: Request, res: Response, next: NextFunc
 // Créer un nouveau message
 export const createMessage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { content, senderId, receiverId } = req.body;
-    const newMessage = await Message.create({ content, senderId, receiverId });
+    const { contenu, id_expediteur, id_destinataire, id_annon } = req.body;
+    const newMessage = await Message.create({ contenu, id_expediteur, id_destinataire, id_annon });
     res.status(201).json(newMessage);
   } catch (error) {
     next(error);

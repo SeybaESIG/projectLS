@@ -5,14 +5,14 @@ import {
   createHistoriqueAnnonce,
   updateHistoriqueAnnonce,
   deleteHistoriqueAnnonce,
-} from '../controllers/historiqueAnnoncesController';
+} from '../controllers/historiqueAnnoncesController.js';
 
 const router = express.Router();
 
-router.get('/historique-annonces', getAllHistoriqueAnnonces);
-router.get('/historique-annonces/:id', getHistoriqueAnnonceById);
-router.post('/historique-annonces', createHistoriqueAnnonce);
-router.put('/historique-annonces/:id', updateHistoriqueAnnonce);
-router.delete('/historique-annonces/:id', deleteHistoriqueAnnonce);
+router.get('/', getAllHistoriqueAnnonces);
+router.get('/:id', getHistoriqueAnnonceById);
+router.post('/', createHistoriqueAnnonce);
+router.put('/:id', updateHistoriqueAnnonce);
+router.delete('/:id', deleteHistoriqueAnnonce);
 
 export default router;

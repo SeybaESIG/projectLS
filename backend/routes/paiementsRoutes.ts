@@ -9,10 +9,10 @@ import {
 
 const router = express.Router();
 
-router.get('/paiements', getAllPaiements);
-router.get('/paiements/:id', getPaiementById);
-router.post('/paiements', createPaiement);
-router.put('/paiements/:id', updatePaiement);
-router.delete('/paiements/:id', deletePaiement);
+router.get('/', getAllPaiements);
+router.get('/:id', getPaiementById);
+router.post('/', createPaiement);
+router.put('/:id', updatePaiement);
+router.delete('/:id', deletePaiement);
 
 export default router;

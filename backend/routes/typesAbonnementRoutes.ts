@@ -5,14 +5,14 @@ import {
     createTypeAbonnement,
     updateTypeAbonnement,
     deleteTypeAbonnement,
-} from '../controllers/typesAbonnementController';
+} from '../controllers/typesAbosController.js';
 
 const router = express.Router();
 
-router.get('/types-abonnement', getAllTypesAbonnement);
-router.get('/types-abonnement/:id', getTypeAbonnementById);
-router.post('/types-abonnement', createTypeAbonnement);
-router.patch('/types-abonnement/:id', updateTypeAbonnement);
-router.delete('/types-abonnement/:id', deleteTypeAbonnement);
+router.get('/', getAllTypesAbonnement);
+router.get('/:id', getTypeAbonnementById);
+router.post('/', createTypeAbonnement);
+router.patch('/:id', updateTypeAbonnement);
+router.delete('/:id', deleteTypeAbonnement);
 
 export default router;

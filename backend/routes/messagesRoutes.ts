@@ -5,14 +5,14 @@ import {
   createMessage,
   updateMessage,
   deleteMessage,
-} from '../controllers/messagesController';
+} from '../controllers/messagesController.js';
 
 const router = express.Router();
 
-router.get('/messages', getAllMessages);
-router.get('/messages/:id', getMessageById);
-router.post('/messages', createMessage);
-router.put('/messages/:id', updateMessage);
-router.delete('/messages/:id', deleteMessage);
+router.get('/', getAllMessages);
+router.get('/:id', getMessageById);
+router.post('/', createMessage);
+router.put('/:id', updateMessage);
+router.delete('/:id', deleteMessage);
 
 export default router;

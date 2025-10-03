@@ -1,3 +1,6 @@
+import type { Request, Response, NextFunction } from 'express';
+import { HistoriqueAbonnement } from '../models/index.js';
+
 // Récupérer tous les historiques d'abonnement
 export const getAllHistoriqueAbonnements = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -11,7 +14,8 @@ export const getAllHistoriqueAbonnements = async (req: Request, res: Response, n
 // Récupérer un historique d'abonnement par ID
 export const getHistoriqueAbonnementById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const historique = await HistoriqueAbonnement.findByPk(req.params.id);
+        const id = Number(req.params['id']);
+        const historique = await HistoriqueAbonnement.findByPk(id);
         if (!historique) {
             return res.status(404).json({ message: 'Historique de l\'abonnement introuvable' });
         }
@@ -34,7 +38,8 @@ export const createHistoriqueAbonnement = async (req: Request, res: Response, ne
 // Mettre à jour un historique d'abonnement
 export const updateHistoriqueAbonnement = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const historique = await HistoriqueAbonnement.findByPk(req.params.id);
+        const id = Number(req.params['id']);
+        const historique = await HistoriqueAbonnement.findByPk(id);
         if (!historique) {
             return res.status(404).json({ message: 'Historique de l\'abonnement introuvable' });
         }
@@ -48,7 +53,8 @@ export const updateHistoriqueAbonnement = async (req: Request, res: Response, ne
 // Supprimer un historique d'abonnement
 export const deleteHistoriqueAbonnement = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const historique = await HistoriqueAbonnement.findByPk(req.params.id);
+        const id = Number(req.params['id']);
+        const historique = await HistoriqueAbonnement.findByPk(id);
         if (!historique) {
             return res.status(404).json({ message: 'Historique de l\'abonnement introuvable' });
         }

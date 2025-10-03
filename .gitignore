@@ -45,5 +45,12 @@ temp/
 *.swp
 *~
 
+# TypeScript source files and source maps
+*.ts
+*.ts.map
+*.js.map
+*.d.ts.map
+*.js
 # Autres
 backend/database.uml
+/backend/database_script.sql

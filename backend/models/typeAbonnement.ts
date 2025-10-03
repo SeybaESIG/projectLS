@@ -1,5 +1,5 @@
 // Modèle Sequelize pour la table tb_types_abonnement
-import { Model, DataTypes, InferAttributes, InferCreationAttributes } from 'sequelize';
+import { Model, DataTypes, type InferAttributes, type InferCreationAttributes, type CreationOptional } from 'sequelize';
 import sequelize from '../config/db.js';
 
 // Modèle: tb_types_abonnement
@@ -7,7 +7,7 @@ export class TypeAbonnement extends Model<
   InferAttributes<TypeAbonnement>,
   InferCreationAttributes<TypeAbonnement>
 > {
-  declare id_type_abonnement: number;
+  declare id_type_abonnement: CreationOptional<number>;
   declare nom_type: string;
   declare prix: number;
   declare duree_mois: number;

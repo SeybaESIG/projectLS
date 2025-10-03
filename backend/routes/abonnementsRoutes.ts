@@ -9,10 +9,10 @@ import {
 
 const router = express.Router();
 
-router.get('/abonnements', getAllAbonnements);
-router.get('/abonnements/:id', getAbonnementById);
-router.post('/abonnements', createAbonnement);
-router.patch('/abonnements/:id', updateAbonnement);
-router.delete('/abonnements/:id', deleteAbonnement);
+router.get('/', getAllAbonnements);
+router.get('/:id', getAbonnementById);
+router.post('/', createAbonnement);
+router.patch('/:id', updateAbonnement);
+router.delete('/:id', deleteAbonnement);
 
 export default router;

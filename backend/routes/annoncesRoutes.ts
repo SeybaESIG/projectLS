@@ -5,14 +5,14 @@ import {
   createAnnonce,
   updateAnnonce,
   deleteAnnonce,
-} from '../controllers/annoncesController';
+} from '../controllers/annoncesController.js';
 
 const router = express.Router();
 
-router.get('/annonces', getAllAnnonces);
-router.get('/annonces/:id', getAnnonceById);
-router.post('/annonces', createAnnonce);
-router.put('/annonces/:id', updateAnnonce);
-router.delete('/annonces/:id', deleteAnnonce);
+router.get('/', getAllAnnonces);
+router.get('/:id', getAnnonceById);
+router.post('/', createAnnonce);
+router.put('/:id', updateAnnonce);
+router.delete('/:id', deleteAnnonce);
 
 export default router;

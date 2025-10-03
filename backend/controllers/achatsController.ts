@@ -14,7 +14,8 @@ export const getAllAchats = async (req: Request, res: Response, next: NextFuncti
 // Récupérer un Achat par ID
 export const getAchatById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const achat = await Achat.findByPk(req.params.id);
+    const { id_util, id_annon } = req.params as { id_util: string; id_annon: string };
+    const achat = await Achat.findOne({ where: { id_util: Number(id_util), id_annon: Number(id_annon) } });
     if (!achat) return res.status(404).json({ message: 'Achat non trouvé' });
     res.json(achat);
   } catch (error) {
@@ -35,9 +36,10 @@ export const createAchat = async (req: Request, res: Response, next: NextFunctio
 // Mettre à jour un Achat
 export const updateAchat = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const [updated] = await Achat.update(req.body, { where: { id: req.params.id } });
+    const { id_util, id_annon } = req.params as { id_util: string; id_annon: string };
+    const [updated] = await Achat.update(req.body, { where: { id_util: Number(id_util), id_annon: Number(id_annon) } });
     if (!updated) return res.status(404).json({ message: 'Achat non trouvé' });
-    const updatedAchat = await Achat.findByPk(req.params.id);
+    const updatedAchat = await Achat.findOne({ where: { id_util: Number(id_util), id_annon: Number(id_annon) } });
     res.json(updatedAchat);
   } catch (error) {
     next(error);
@@ -47,7 +49,8 @@ export const updateAchat = async (req: Request, res: Response, next: NextFunctio
 // Supprimer un Achat
 export const deleteAchat = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const deleted = await Achat.destroy({ where: { id: req.params.id } });
+    const { id_util, id_annon } = req.params as { id_util: string; id_annon: string };
+    const deleted = await Achat.destroy({ where: { id_util: Number(id_util), id_annon: Number(id_annon) } });
     if (!deleted) return res.status(404).json({ message: 'Achat non trouvé' });
     res.json({ message: 'Achat supprimé' });
   } catch (error) {

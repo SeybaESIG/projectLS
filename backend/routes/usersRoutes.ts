@@ -12,13 +12,12 @@ import {
 const router = Router();
 
 router.get('/', listUsers);
+// Specific routes must come before generic ":id" to avoid shadowing
+router.get('/role/:roleId', getUsersByRole);
+router.get('/ville/:villeId', getUsersByVille);
 router.get('/:id', getUserById);
 router.post('/', createUser);
 router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
-
-// Additional routes for filtering
-router.get('/role/:roleId', getUsersByRole);
-router.get('/ville/:villeId', getUsersByVille);
 
 export default router;

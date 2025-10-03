@@ -5,14 +5,14 @@ import {
   createEvaluation,
   updateEvaluation,
   deleteEvaluation,
-} from '../controllers/evaluationsController';
+} from '../controllers/evaluationsController.js';
 
 const router = express.Router();
 
-router.get('/evaluations', getAllEvaluations);
-router.get('/evaluations/:id', getEvaluationById);
-router.post('/evaluations', createEvaluation);
-router.put('/evaluations/:id', updateEvaluation);
-router.delete('/evaluations/:id', deleteEvaluation);
+router.get('/', getAllEvaluations);
+router.get('/:id', getEvaluationById);
+router.post('/', createEvaluation);
+router.put('/:id', updateEvaluation);
+router.delete('/:id', deleteEvaluation);
 
 export default router;
