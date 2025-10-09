@@ -5,11 +5,13 @@ import {
   createEvaluation,
   updateEvaluation,
   deleteEvaluation,
+  searchEvaluations,
 } from '../controllers/evaluationsController.js';
 
 const router = express.Router();
 
 router.get('/', getAllEvaluations);
+router.get('/search', searchEvaluations);
 router.get('/:id', getEvaluationById);
 router.post('/', createEvaluation);
 router.put('/:id', updateEvaluation);

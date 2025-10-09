@@ -90,6 +90,56 @@ describe('Pays Routes - Integration Tests', () => {
       expect(response.body.length).toBeGreaterThanOrEqual(200);
     });
   });
+
+  describe('GET /api/pays/search', () => {
+    it('devrait chercher des pays par nom', async () => {
+      const response = await request(app)
+        .get('/api/pays/search?name=France')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      expect(response.body[0]).toHaveProperty('nom_pays');
+      expect(response.body[0].nom_pays).toMatch(/France/i);
+    });
+
+    it('devrait chercher des pays avec une recherche partielle', async () => {
+      const response = await request(app)
+        .get('/api/pays/search?name=Mali')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      const maliFound = response.body.some((p: any) => p.nom_pays === 'Mali');
+      expect(maliFound).toBe(true);
+    });
+
+    it('devrait faire une recherche insensible à la casse', async () => {
+      const response = await request(app)
+        .get('/api/pays/search?name=france')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+    });
+
+    it('devrait retourner une erreur 400 sans paramètres', async () => {
+      const response = await request(app)
+        .get('/api/pays/search')
+        .expect(400);
+
+      expect(response.body).toHaveProperty('message');
+    });
+
+    it('devrait retourner un tableau vide si aucun résultat', async () => {
+      const response = await request(app)
+        .get('/api/pays/search?name=XXXYYYZZZ999')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBe(0);
+    });
+  });
 });
 
 

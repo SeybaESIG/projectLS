@@ -5,6 +5,20 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
     // Journaliser les détails de l'erreur
     console.error(err);
 
+    // Gestion des erreurs de contrainte UNIQUE de Sequelize
+    if (err.name === 'SequelizeUniqueConstraintError') {
+        const field = err.errors?.[0]?.path;
+        if (field === 'email') {
+            return res.status(409).json({ message: 'Cette adresse email est déjà utilisée' });
+        } else if (field === 'tel') {
+            return res.status(409).json({ message: 'Ce numéro de téléphone est déjà utilisé' });
+        } else if (field === 'username') {
+            return res.status(409).json({ message: 'Ce nom d\'utilisateur est déjà utilisé' });
+        } else {
+            return res.status(409).json({ message: `Le champ ${field} doit être unique` });
+        }
+    }
+
     // Gestion personnalisée des erreurs
     if (err.status === 400) {
         return res.status(400).json({ message: err.message || 'Mauvaise requête' });

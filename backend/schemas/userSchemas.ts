@@ -9,9 +9,9 @@ export const userSchemas = {
     create: Joi.object({
         id_ville: commonSchemas.id,
         id_role: commonSchemas.id,
-        username: Joi.string().alphanum().min(3).max(30).required()
+        username: Joi.string().pattern(/^[a-zA-Z0-9._-]+$/).min(3).max(30).required()
             .messages({
-                'string.alphanum': 'Le nom d\'utilisateur ne doit contenir que des caractères alphanumériques',
+                'string.pattern.base': 'Le nom d\'utilisateur ne doit contenir que des lettres, chiffres, points, tirets et underscores',
                 'string.min': 'Le nom d\'utilisateur doit contenir au moins 3 caractères',
                 'string.max': 'Le nom d\'utilisateur ne doit pas dépasser 30 caractères'
             }),
@@ -52,7 +52,10 @@ export const userSchemas = {
     update: Joi.object({
         id_ville: commonSchemas.id.optional(),
         id_role: commonSchemas.id.optional(),
-        username: Joi.string().alphanum().min(3).max(30).optional(),
+        username: Joi.string().pattern(/^[a-zA-Z0-9._-]+$/).min(3).max(30).optional()
+            .messages({
+                'string.pattern.base': 'Le nom d\'utilisateur ne doit contenir que des lettres, chiffres, points, tirets et underscores'
+            }),
         nom: Joi.string().pattern(/^[a-zA-ZÀ-ÿ\s\-]+$/).min(2).max(100).optional(),
         prenom: Joi.string().pattern(/^[a-zA-ZÀ-ÿ\s\-]+$/).min(2).max(100).optional(),
         email: commonSchemas.email.optional(),

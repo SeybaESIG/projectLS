@@ -204,6 +204,57 @@ describe('Aeroports Routes - Integration Tests', () => {
       expect(invalidCodes.length).toBe(0);
     });
   });
+
+  describe('GET /api/aeroports/search', () => {
+    it('devrait chercher des aéroports par nom', async () => {
+      const response = await request(app)
+        .get('/api/aeroports/search?name=Charles')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      expect(response.body[0]).toHaveProperty('nom_aeroport');
+      expect(response.body[0].nom_aeroport).toMatch(/Charles/i);
+    });
+
+    it('devrait chercher des aéroports par ville', async () => {
+      const response = await request(app)
+        .get('/api/aeroports/search?ville=Paris')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      // Vérifier que les résultats incluent les données de la ville
+      if (response.body[0].tb_ville) {
+        expect(response.body[0].tb_ville.nom_ville).toMatch(/Paris/i);
+      }
+    });
+
+    it('devrait combiner nom et ville dans la recherche', async () => {
+      const response = await request(app)
+        .get('/api/aeroports/search?name=International&ville=Bamako')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+    });
+
+    it('devrait retourner une erreur 400 sans paramètres', async () => {
+      const response = await request(app)
+        .get('/api/aeroports/search')
+        .expect(400);
+
+      expect(response.body).toHaveProperty('message');
+    });
+
+    it('devrait retourner un tableau vide si aucun résultat', async () => {
+      const response = await request(app)
+        .get('/api/aeroports/search?name=XXXYYYZZZ999')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBe(0);
+    });
+  });
 });
 
 

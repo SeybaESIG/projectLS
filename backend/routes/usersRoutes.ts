@@ -6,13 +6,14 @@ import {
     updateUser,
     deleteUser,
     getUsersByRole,
-    getUsersByVille
+    getUsersByVille,
+    searchUsers
 } from '../controllers/usersControllers.js';
 
 const router = Router();
 
 router.get('/', listUsers);
-// Specific routes must come before generic ":id" to avoid shadowing
+router.get('/search', searchUsers);
 router.get('/role/:roleId', getUsersByRole);
 router.get('/ville/:villeId', getUsersByVille);
 router.get('/:id', getUserById);

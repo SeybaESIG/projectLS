@@ -45,3 +45,10 @@ coverage/
 tmp/
 temp/
 
+# Certificats SSL (auto-signés pour le développement local)
+certs/
+*.key
+*.cert
+*.pem
+
+/jest.config.mjs

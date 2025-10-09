@@ -60,6 +60,12 @@ async function importAeroports() {
                 console.log(`   Progression: ${i + 1}/${records.length} lignes traitées...`);
             }
 
+            // Vérifier que la ligne existe
+            if (!row) {
+                skipped++;
+                continue;
+            }
+
             // Ignorer si pas de code IATA
             if (!row.iata_code || row.iata_code.trim() === '') {
                 skipped++;
@@ -165,8 +171,8 @@ async function importAeroports() {
         const [aeroportsCount] = await sequelize.query('SELECT COUNT(*) as count FROM tb_aeroports;');
         
         console.log('\n📈 État final de la base de données:');
-        console.log(`   - tb_villes: ${villesCount[0].count} lignes`);
-        console.log(`   - tb_aeroports: ${aeroportsCount[0].count} lignes`);
+        console.log(`   - tb_villes: ${(villesCount[0] as any)?.count || 0} lignes`);
+        console.log(`   - tb_aeroports: ${(aeroportsCount[0] as any)?.count || 0} lignes`);
 
         console.log('\n🎉 Import terminé avec succès!');
 

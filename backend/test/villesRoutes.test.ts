@@ -119,5 +119,66 @@ describe('Villes Routes - Integration Tests', () => {
       expect(villesWithoutPays.length).toBe(0);
     });
   });
+
+  describe('GET /api/villes/search', () => {
+    it('devrait chercher des villes par nom', async () => {
+      const response = await request(app)
+        .get('/api/villes/search?name=Paris')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      expect(response.body[0]).toHaveProperty('nom_ville');
+      expect(response.body[0].nom_ville).toMatch(/Paris/i);
+    });
+
+    it('devrait chercher des villes par pays', async () => {
+      const response = await request(app)
+        .get('/api/villes/search?pays=Mali')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      // Vérifier que les résultats incluent les données du pays
+      if (response.body[0].tb_pay) {
+        expect(response.body[0].tb_pay.nom_pays).toMatch(/Mali/i);
+      }
+    });
+
+    it('devrait combiner nom et pays dans la recherche', async () => {
+      const response = await request(app)
+        .get('/api/villes/search?name=Bamako&pays=Mali')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+    });
+
+    it('devrait retourner une erreur 400 sans paramètres', async () => {
+      const response = await request(app)
+        .get('/api/villes/search')
+        .expect(400);
+
+      expect(response.body).toHaveProperty('message');
+    });
+
+    it('devrait retourner un tableau vide si aucun résultat', async () => {
+      const response = await request(app)
+        .get('/api/villes/search?name=XXXYYYZZZ999')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBe(0);
+    });
+
+    it('devrait faire une recherche insensible à la casse', async () => {
+      const response = await request(app)
+        .get('/api/villes/search?name=bamako')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+    });
+  });
 });
 

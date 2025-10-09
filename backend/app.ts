@@ -50,21 +50,21 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/roles', rolesRouter);
 app.use('/api/pays', paysRouter);
 app.use('/api/villes', villesRouter);
 app.use('/api/aeroports', aeroportsRouter);
-app.use('/abonnements', abonnementsRouter);
-app.use('/types_abonnement', typesAbonnementRouter);
-app.use('/historique_abonnements', historiqueAbonnementsRouter);
-app.use('/annonces', annoncesRouter);
-app.use('/messages', messagesRouter);
-app.use('/transactions', transactionsRouter);
-app.use('/paiements', paiementsRouter);
-app.use('/evaluations', evaluationsRouter);
-app.use('/historique_annonces', historiqueAnnoncesRouter);
-app.use('/achats', achatsRouter);
+app.use('/api/abonnements', abonnementsRouter);
+app.use('/api/types_abonnement', typesAbonnementRouter);
+app.use('/api/historique_abonnements', historiqueAbonnementsRouter);
+app.use('/api/annonces', annoncesRouter);
+app.use('/api/messages', messagesRouter);
+app.use('/api/transactions', transactionsRouter);
+app.use('/api/paiements', paiementsRouter);
+app.use('/api/evaluations', evaluationsRouter);
+app.use('/api/historique_annonces', historiqueAnnoncesRouter);
+app.use('/api/achats', achatsRouter);
 
 // // Intercepter les erreurs 404 et transférer au gestionnaire d'erreurs
 app.use((req: Request, res: Response, next: NextFunction) => {

@@ -1,12 +1,14 @@
 import express from 'express';
 import {
     getAllAeroports,
-    getAeroportById
+    getAeroportById,
+    searchAeroport
 } from '../controllers/aeroportsController.js';
 
 const router = express.Router();
 
 router.get('/', getAllAeroports);
+router.get('/search', searchAeroport);
 router.get('/:id', getAeroportById);
 
 export default router;
