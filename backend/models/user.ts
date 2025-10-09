@@ -1,9 +1,46 @@
-import { DataTypes } from 'sequelize';
+import {
+    DataTypes,
+    Model,
+    type InferAttributes,
+    type InferCreationAttributes,
+    type CreationOptional,
+    type ForeignKey,
+    type NonAttribute,
+} from 'sequelize';
 import sequelize from '../config/db.js';
+import type { Role } from './role.js';
+import type { Ville } from './ville.js';
+import type { Message } from './message.js';
+import type { Transaction } from './transaction.js';
 
 // Modèle: tb_utilisateurs
-export const Utilisateur = sequelize.define(
-    'Utilisateur',
+export class Utilisateur extends Model<InferAttributes<Utilisateur>, InferCreationAttributes<Utilisateur>> {
+    declare id_util: CreationOptional<number>;
+    declare id_ville: ForeignKey<Ville['id_ville']>;
+    declare id_role: ForeignKey<Role['id_role']>;
+    declare username: string;
+    declare nom: string;
+    declare prenom: string;
+    declare email: string | null;
+    declare tel: string | null;
+    declare mot_de_passe: string;
+    declare date_inscription: CreationOptional<Date>;
+    declare piece_id: string | null;
+    declare photo: string | null;
+    declare adresse: string | null;
+    declare detail_adresse: string | null;
+
+    // Champs d'association
+    declare Role?: NonAttribute<Role>;
+    declare Ville?: NonAttribute<Ville>;
+    declare messagesExpedies?: NonAttribute<Message[]>;
+    declare messagesRecus?: NonAttribute<Message[]>;
+    declare transactionsPayeur?: NonAttribute<Transaction[]>;
+    declare transactionsReceveur?: NonAttribute<Transaction[]>;
+}
+
+// Initialisation du modèle
+Utilisateur.init(
     {
         id_util: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         id_ville: { type: DataTypes.INTEGER, allowNull: false },
@@ -20,7 +57,7 @@ export const Utilisateur = sequelize.define(
         adresse: { type: DataTypes.STRING(255), allowNull: true },
         detail_adresse: { type: DataTypes.STRING(255), allowNull: true },
     },
-    { timestamps: false, tableName: 'tb_utilisateurs' }
+    { sequelize, timestamps: false, tableName: 'tb_utilisateurs' }
 );
 
 

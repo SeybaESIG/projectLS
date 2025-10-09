@@ -1,0 +1,47 @@
+# Variables d'environnement - NE JAMAIS COMMITER
+.env
+.env.local
+.env.*.local
+
+# Mais garder .env.example pour la documentation
+!.env.example
+
+# Dépendances
+node_modules/
+
+# Fichiers de build
+dist/
+build/
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+
+# Mais garder les fichiers de configuration
+!jest.config.mjs
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+import-pays.log
+import-pays-error.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Fichiers temporaires
+tmp/
+temp/
+

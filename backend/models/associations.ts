@@ -13,6 +13,7 @@ import { Transaction } from './transaction.js';
 import { Paiement } from './paiement.js';
 import { Evaluation } from './evaluation.js';
 import { HistoriqueAnnonce } from './historiqueAnnonce.js';
+import { Achat } from './achat.js';
 
 export function initAssociations(): void {
     // Utilisateur -> Role, Ville
@@ -42,12 +43,15 @@ export function initAssociations(): void {
     Annonce.belongsTo(Utilisateur, { foreignKey: 'id_util' });
     Utilisateur.hasMany(Annonce, { foreignKey: 'id_util' });
 
+    // Annonce -> Aeroport (départ et arrivée)
+    Annonce.belongsTo(Aeroport, { as: 'aeroportDepart', foreignKey: 'id_aerodep' });
+    Annonce.belongsTo(Aeroport, { as: 'aeroportArrivee', foreignKey: 'id_aeroarr' });
+    Aeroport.hasMany(Annonce, { as: 'annoncesDepart', foreignKey: 'id_aerodep' });
+    Aeroport.hasMany(Annonce, { as: 'annoncesArrivee', foreignKey: 'id_aeroarr' });
+
     // Aeroport -> Ville
     Aeroport.belongsTo(Ville, { foreignKey: 'id_ville' });
     Ville.hasMany(Aeroport, { foreignKey: 'id_ville' });
-
-    // NOTE : les références composites (id_ville_dep, id_aerodep) et (id_ville_arr, id_aeroarr)
-    // ne sont pas exprimées comme FKs ORM dans Sequelize.
 
     // Message -> Utilisateur (expéditeur/destinataire), Annonce
     Message.belongsTo(Utilisateur, { as: 'expediteur', foreignKey: 'id_expediteur' });
