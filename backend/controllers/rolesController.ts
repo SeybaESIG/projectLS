@@ -1,5 +1,6 @@
 import type {Request, Response, NextFunction} from 'express';
 import { Role } from '../models/index.js';
+import { Op } from 'sequelize';
 
 // Récupérer tous les rôles
 export const getAllRoles = async (req: Request, res: Response, next: NextFunction) => {
@@ -50,7 +51,7 @@ export const updateRole = async (req: Request, res: Response, next: NextFunction
             return res.status(404).json({ message: 'Rôle introuvable' });
         }
         if (req.body.nom_role) {
-            const exists = await Role.findOne({ where: { nom_role: req.body.nom_role, id_role: { $ne: role.id_role } } });
+            const exists = await Role.findOne({ where: { nom_role: req.body.nom_role, id_role: { [Op.ne]: role.id_role } } });
             if (exists) {
                 return res.status(409).json({ message: 'Rôle déjà existant' });
             }

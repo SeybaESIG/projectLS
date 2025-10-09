@@ -8,10 +8,14 @@ import { dirname } from 'path';
 
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
+import cors from 'cors';
 
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/usersRoutes.js';
 import rolesRouter from './routes/rolesRoutes.js';
+import paysRouter from './routes/paysRoutes.js';
+import villesRouter from './routes/villesRoutes.js';
+import aeroportsRouter from './routes/aeroportsRoutes.js';
 import abonnementsRouter from './routes/abonnementsRoutes.js';
 import typesAbonnementRouter from './routes/typesAbonnementRoutes.js';
 import historiqueAbonnementsRouter from './routes/historiqueAbonnementsRoutes.js';
@@ -31,6 +35,14 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+// Configuration CORS
+app.use(cors({
+    origin: process.env.FRONTEND_URL || '*', // À configurer avec l'URL du frontend
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -39,7 +51,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/roles', rolesRouter);
+app.use('/api/roles', rolesRouter);
+app.use('/api/pays', paysRouter);
+app.use('/api/villes', villesRouter);
+app.use('/api/aeroports', aeroportsRouter);
 app.use('/abonnements', abonnementsRouter);
 app.use('/types_abonnement', typesAbonnementRouter);
 app.use('/historique_abonnements', historiqueAbonnementsRouter);
