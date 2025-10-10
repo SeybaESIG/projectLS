@@ -283,7 +283,7 @@ describe('Users Routes - Integration Tests', () => {
       };
 
       const response = await request(app)
-        .put(`/api/users/${testUserId}`)
+        .patch(`/api/users/${testUserId}`)
         .send(updates)
         .expect(200);
 
@@ -294,7 +294,7 @@ describe('Users Routes - Integration Tests', () => {
 
     it('devrait retourner 404 pour un ID inexistant', async () => {
       await request(app)
-        .put('/api/users/999999')
+        .patch('/api/users/999999')
         .send({ nom: 'Test' })
         .expect(404);
     });
@@ -525,7 +525,7 @@ describe('Users Routes - Integration Tests', () => {
 
     it('ne devrait jamais retourner le mot de passe dans PUT', async () => {
       const response = await request(app)
-        .put(`/api/users/${testUserId}`)
+        .patch(`/api/users/${testUserId}`)
         .send({ nom: 'UpdatedAgain' })
         .expect(200);
 

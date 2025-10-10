@@ -18,7 +18,7 @@ router.get('/role/:roleId', getUsersByRole);
 router.get('/ville/:villeId', getUsersByVille);
 router.get('/:id', getUserById);
 router.post('/', createUser);
-router.put('/:id', updateUser);
+router.patch('/:id', updateUser);
 router.delete('/:id', deleteUser);
 
 export default router;
