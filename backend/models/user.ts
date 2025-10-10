@@ -37,6 +37,13 @@ export class Utilisateur extends Model<InferAttributes<Utilisateur>, InferCreati
     declare messagesRecus?: NonAttribute<Message[]>;
     declare transactionsPayeur?: NonAttribute<Transaction[]>;
     declare transactionsReceveur?: NonAttribute<Transaction[]>;
+
+    // Masquer le mot de passe dans toutes les réponses JSON
+    toJSON() {
+        const values = { ...this.get() };
+        delete values.mot_de_passe;
+        return values;
+    }
 }
 
 // Initialisation du modèle
@@ -49,7 +56,7 @@ Utilisateur.init(
         nom: { type: DataTypes.STRING(100), allowNull: false },
         prenom: { type: DataTypes.STRING(100), allowNull: false },
         email: { type: DataTypes.STRING(255), allowNull: true, unique: true },
-        tel: { type: DataTypes.STRING(50), allowNull: true },
+        tel: { type: DataTypes.STRING(50), allowNull: true, unique: true },
         mot_de_passe: { type: DataTypes.STRING(255), allowNull: false },
         date_inscription: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
         piece_id: { type: DataTypes.STRING(100), allowNull: true },

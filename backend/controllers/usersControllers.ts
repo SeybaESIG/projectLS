@@ -2,12 +2,34 @@ import type { Request, Response, NextFunction } from 'express';
 import { Utilisateur, Role, Ville } from '../models/index.js';
 import bcrypt from 'bcrypt';
 import { userSchemas } from '../schemas/index.js';
+import { Op } from 'sequelize';
 
 // Récupérer tous les utilisateurs avec leurs rôles et villes associés
+// Support pagination: /api/users?page=1&limit=50
 export async function listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const users = await Utilisateur.findAll({ include: [Role, Ville] });
-        res.json(users);
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 50));
+        const offset = (page - 1) * limit;
+
+        const { count, rows: users } = await Utilisateur.findAndCountAll({
+            include: [Role, Ville],
+            limit,
+            offset,
+            order: [['date_inscription', 'DESC']]
+        });
+
+        const totalPages = Math.ceil(count / limit);
+
+        res.json({
+            data: users,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                totalPages
+            }
+        });
     } catch (err) {
         next(err);
     }
@@ -62,8 +84,8 @@ export async function createUser(req: Request, res: Response, next: NextFunction
             username,
             nom,
             prenom,
-            email: email ?? null,
-            tel: tel ?? null,
+            email,
+            tel,
             mot_de_passe: hashedPassword,
             piece_id: piece_id ?? null,
             photo: photo ?? null,
@@ -71,7 +93,21 @@ export async function createUser(req: Request, res: Response, next: NextFunction
             detail_adresse: detail_adresse ?? null,
         });
         res.status(201).json(created);
-    } catch (err) {
+    } catch (err: any) {
+        // Gestion des erreurs de contrainte UNIQUE
+        if (err.name === 'SequelizeUniqueConstraintError') {
+            const field = err.errors?.[0]?.path;
+            if (field === 'email') {
+                res.status(409).json({ message: 'Cette adresse email est déjà utilisée' });
+                return;
+            } else if (field === 'tel') {
+                res.status(409).json({ message: 'Ce numéro de téléphone est déjà utilisé' });
+                return;
+            } else if (field === 'username') {
+                res.status(409).json({ message: 'Ce nom d\'utilisateur est déjà utilisé' });
+                return;
+            }
+        }
         next(err);
     }
 }
@@ -102,7 +138,21 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
 
         await user.update(updates);
         res.json(user);
-    } catch (err) {
+    } catch (err: any) {
+        // Gestion des erreurs de contrainte UNIQUE
+        if (err.name === 'SequelizeUniqueConstraintError') {
+            const field = err.errors?.[0]?.path;
+            if (field === 'email') {
+                res.status(409).json({ message: 'Cette adresse email est déjà utilisée' });
+                return;
+            } else if (field === 'tel') {
+                res.status(409).json({ message: 'Ce numéro de téléphone est déjà utilisé' });
+                return;
+            } else if (field === 'username') {
+                res.status(409).json({ message: 'Ce nom d\'utilisateur est déjà utilisé' });
+                return;
+            }
+        }
         next(err);
     }
 }
@@ -139,6 +189,98 @@ export async function getUsersByVille(req: Request, res: Response, next: NextFun
         const villeId = Number(req.params['villeId']);
         const users = await Utilisateur.findAll({ where: { id_ville: villeId }, include: [Role, Ville] });
         res.json(users);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Rechercher des utilisateurs (ex: /api/users/search?username=alice&ville=Bamako&role=admin&page=1&limit=20)
+// Paramètres possibles: username, nom, prenom, email, tel, date_inscription, ville, role, page, limit
+export async function searchUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const { username, nom, prenom, email, tel, date_inscription, ville, role, page: pageParam, limit: limitParam } = req.query;
+        
+        const whereClause: any = {};
+        const includeClause: any[] = [];
+        
+        if (username) {
+            whereClause.username = { [Op.iLike]: `%${username}%` };
+        }
+        if (nom) {
+            whereClause.nom = { [Op.iLike]: `%${nom}%` };
+        }
+        if (prenom) {
+            whereClause.prenom = { [Op.iLike]: `%${prenom}%` };
+        }
+        if (email) {
+            whereClause.email = { [Op.iLike]: `%${email}%` };
+        }
+        if (tel) {
+            whereClause.tel = { [Op.iLike]: `%${tel}%` };
+        }
+        if (date_inscription) {
+            // Recherche par date exacte ou par année-mois-jour
+            whereClause.date_inscription = {
+                [Op.gte]: new Date(date_inscription as string),
+                [Op.lt]: new Date(new Date(date_inscription as string).getTime() + 24 * 60 * 60 * 1000)
+            };
+        }
+        
+        // Recherche par nom de rôle
+        if (role) {
+            includeClause.push({
+                model: Role,
+                where: {
+                    nom_role: { [Op.iLike]: `%${role}%` }
+                },
+                required: true
+            });
+        } else {
+            includeClause.push(Role);
+        }
+        
+        // Recherche par nom de ville
+        if (ville) {
+            includeClause.push({
+                model: Ville,
+                where: {
+                    nom_ville: { [Op.iLike]: `%${ville}%` }
+                },
+                required: true
+            });
+        } else {
+            includeClause.push(Ville);
+        }
+        
+        if (Object.keys(whereClause).length === 0 && !ville && !role) {
+            res.status(400).json({ message: 'Au moins un paramètre de recherche est requis (username, nom, prenom, email, tel, date_inscription, ville, role)' });
+            return;
+        }
+        
+        // Pagination
+        const page = Math.max(1, Number(pageParam) || 1);
+        const limit = Math.min(100, Math.max(1, Number(limitParam) || 50));
+        const offset = (page - 1) * limit;
+        
+        const { count, rows: users } = await Utilisateur.findAndCountAll({
+            where: whereClause,
+            include: includeClause,
+            limit,
+            offset,
+            order: [['date_inscription', 'DESC']]
+        });
+        
+        const totalPages = Math.ceil(count / limit);
+        
+        res.json({
+            data: users,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                totalPages
+            }
+        });
     } catch (err) {
         next(err);
     }
