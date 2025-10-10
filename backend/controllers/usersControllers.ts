@@ -5,10 +5,31 @@ import { userSchemas } from '../schemas/index.js';
 import { Op } from 'sequelize';
 
 // Récupérer tous les utilisateurs avec leurs rôles et villes associés
+// Support pagination: /api/users?page=1&limit=50
 export async function listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const users = await Utilisateur.findAll({ include: [Role, Ville] });
-        res.json(users);
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 50));
+        const offset = (page - 1) * limit;
+
+        const { count, rows: users } = await Utilisateur.findAndCountAll({
+            include: [Role, Ville],
+            limit,
+            offset,
+            order: [['date_inscription', 'DESC']]
+        });
+
+        const totalPages = Math.ceil(count / limit);
+
+        res.json({
+            data: users,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                totalPages
+            }
+        });
     } catch (err) {
         next(err);
     }
@@ -63,8 +84,8 @@ export async function createUser(req: Request, res: Response, next: NextFunction
             username,
             nom,
             prenom,
-            email: email ?? null,
-            tel: tel ?? null,
+            email,
+            tel,
             mot_de_passe: hashedPassword,
             piece_id: piece_id ?? null,
             photo: photo ?? null,
@@ -173,11 +194,11 @@ export async function getUsersByVille(req: Request, res: Response, next: NextFun
     }
 }
 
-// Rechercher des utilisateurs (ex: /api/users/search?username=alice&ville=Bamako&role=admin)
-// Paramètres possibles: username, nom, prenom, email, tel, date_inscription, ville, role
+// Rechercher des utilisateurs (ex: /api/users/search?username=alice&ville=Bamako&role=admin&page=1&limit=20)
+// Paramètres possibles: username, nom, prenom, email, tel, date_inscription, ville, role, page, limit
 export async function searchUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const { username, nom, prenom, email, tel, date_inscription, ville, role } = req.query;
+        const { username, nom, prenom, email, tel, date_inscription, ville, role, page: pageParam, limit: limitParam } = req.query;
         
         const whereClause: any = {};
         const includeClause: any[] = [];
@@ -236,12 +257,30 @@ export async function searchUsers(req: Request, res: Response, next: NextFunctio
             return;
         }
         
-        const users = await Utilisateur.findAll({
+        // Pagination
+        const page = Math.max(1, Number(pageParam) || 1);
+        const limit = Math.min(100, Math.max(1, Number(limitParam) || 50));
+        const offset = (page - 1) * limit;
+        
+        const { count, rows: users } = await Utilisateur.findAndCountAll({
             where: whereClause,
-            include: includeClause
+            include: includeClause,
+            limit,
+            offset,
+            order: [['date_inscription', 'DESC']]
         });
         
-        res.json(users);
+        const totalPages = Math.ceil(count / limit);
+        
+        res.json({
+            data: users,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                totalPages
+            }
+        });
     } catch (err) {
         next(err);
     }

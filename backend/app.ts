@@ -1,6 +1,7 @@
 import createError from 'http-errors';
 import express from 'express';
 import { errorHandler } from './middlewares/errorHandler.js';
+// import { authenticateJWT } from './middlewares/authenticateJWT.js';
 import type { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -49,7 +50,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// Routes publiques
 app.use('/', indexRouter);
+//app.use('/api/users/login', usersRouter);
+
+// Routes protégées
+//app.use(authenticateJWT);
+
 app.use('/api/users', usersRouter);
 app.use('/api/roles', rolesRouter);
 app.use('/api/pays', paysRouter);

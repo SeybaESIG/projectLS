@@ -3,6 +3,10 @@ import express from 'express';
 import type { Application } from 'express';
 import aeroportsRoutes from '../routes/aeroportsRoutes.js';
 import { Aeroport } from '../models/index.js';
+import { initAssociations } from '../models/associations.js';
+
+// Initialiser les associations avant les tests
+initAssociations();
 
 const app: Application = express();
 app.use(express.json());
