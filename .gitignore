@@ -52,5 +52,4 @@ temp/
 *.d.ts.map
 *.js
 # Autres
-backend/database.uml
-/backend/database_script.sql
+
