@@ -18,7 +18,7 @@ export class Transaction extends Model<InferAttributes<Transaction>, InferCreati
     declare id_annon: ForeignKey<number> | null;
     declare montant: string;
     declare statut: string;
-    declare date: Date | null;
+    declare date: CreationOptional<Date>;
 
     // Associations optionnelles
     declare payeur?: NonAttribute<Utilisateur>;
@@ -34,7 +34,7 @@ Transaction.init(
         id_annon: { type: DataTypes.INTEGER, allowNull: true },
         montant: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
         statut: { type: DataTypes.STRING(50), allowNull: false },
-        date: { type: DataTypes.DATE, allowNull: true },
+        date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     },
     { sequelize, timestamps: false, tableName: 'tb_transactions' }
 );

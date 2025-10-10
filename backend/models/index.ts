@@ -10,9 +10,9 @@ export { Abonnement } from './abonnement.js';
 export { TypeAbonnement } from './typeAbonnement.js';
 export { HistoriqueAbonnement } from './historiqueAbonnement.js';
 export { Message } from './message.js';
+export { MsgLecture } from './msgLecture.js';
 export { Transaction } from './transaction.js';
 export { Paiement } from './paiement.js';
 export { Evaluation } from './evaluation.js';
-export { Achat } from './achat.js';
 
 

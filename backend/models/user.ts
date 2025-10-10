@@ -29,6 +29,7 @@ export class Utilisateur extends Model<InferAttributes<Utilisateur>, InferCreati
     declare photo: string | null;
     declare adresse: string | null;
     declare detail_adresse: string | null;
+    declare note_moyenne: CreationOptional<string>;
 
     // Champs d'association
     declare Role?: NonAttribute<Role>;
@@ -40,7 +41,7 @@ export class Utilisateur extends Model<InferAttributes<Utilisateur>, InferCreati
 
     // Masquer le mot de passe dans toutes les réponses JSON
     toJSON() {
-        const values = { ...this.get() };
+        const values: any = { ...this.get() };
         delete values.mot_de_passe;
         return values;
     }
@@ -63,6 +64,7 @@ Utilisateur.init(
         photo: { type: DataTypes.STRING(255), allowNull: true },
         adresse: { type: DataTypes.STRING(255), allowNull: true },
         detail_adresse: { type: DataTypes.STRING(255), allowNull: true },
+        note_moyenne: { type: DataTypes.DECIMAL(3, 2), allowNull: false, defaultValue: 0 },
     },
     { sequelize, timestamps: false, tableName: 'tb_utilisateurs' }
 );

@@ -15,17 +15,25 @@ export const transactionSchemas = {
                 'number.positive': 'Le montant doit être positif',
                 'number.precision': 'Le montant doit avoir au maximum 2 décimales'
             }),
-        statut: Joi.string().valid('pending', 'completed', 'failed', 'cancelled', 'refunded').required()
+        statut: Joi.string().valid('attente', 'validée', 'annulée', 'remboursée').optional().default('attente')
             .messages({
-                'any.only': 'Le statut doit être l\'un des suivants : pending, completed, failed, cancelled, refunded'
+                'any.only': 'Le statut doit être l\'un des suivants : attente, validée, annulée, remboursée'
             }),
         date: commonSchemas.date.optional()
+    }).custom((value, helpers) => {
+        // Valider que le payeur et le receveur sont différents
+        if (value.id_payeur === value.id_receveur) {
+            return helpers.error('users.same');
+        }
+        return value;
+    }).messages({
+        'users.same': 'Le payeur et le receveur doivent être différents'
     }),
 
     // Schéma de mise à jour de transaction
     update: Joi.object({
         montant: Joi.number().positive().precision(2).optional(),
-        statut: Joi.string().valid('pending', 'completed', 'failed', 'cancelled', 'refunded').optional(),
+        statut: Joi.string().valid('attente', 'validée', 'annulée', 'remboursée').optional(),
         date: commonSchemas.date.optional()
     }).min(1), // Au moins un champ doit être fourni
 
@@ -38,12 +46,13 @@ export const transactionSchemas = {
     query: commonSchemas.pagination.keys({
         payeur: commonSchemas.id.optional(),
         receveur: commonSchemas.id.optional(),
-        statut: Joi.string().valid('pending', 'completed', 'failed', 'cancelled', 'refunded').optional(),
+        statut: Joi.string().valid('attente', 'validée', 'annulée', 'remboursée').optional(),
         dateFrom: commonSchemas.date.optional(),
         dateTo: commonSchemas.date.optional(),
         minAmount: Joi.number().positive().precision(2).optional(),
         maxAmount: Joi.number().positive().precision(2).optional(),
-        sortBy: Joi.string().valid('montant', 'date', 'statut').default('date')
+        sortBy: Joi.string().valid('montant', 'date', 'statut').default('date'),
+        order: Joi.string().valid('ASC', 'DESC').default('DESC')
     }).custom((value, helpers) => {
         // Valider la plage de dates
         if (value.dateFrom && value.dateTo && value.dateFrom > value.dateTo) {
