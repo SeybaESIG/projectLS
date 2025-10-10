@@ -1,11 +1,33 @@
 import type {Request, Response, NextFunction} from 'express';
 import { TypeAbonnement } from '../models/index.js';
+import { Op } from 'sequelize';
 
-// Récupérer tous les types d'abonnement
+// Récupérer tous les types d'abonnement avec pagination
 export const getAllTypesAbonnement = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const types = await TypeAbonnement.findAll();
-        res.json(types);
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 50));
+        const offset = (page - 1) * limit;
+        const sortBy = (req.query.sortBy as string) || 'id_type_abonnement';
+        const sort = ((req.query.sort as string) || 'asc').toUpperCase();
+
+        const { count, rows: types } = await TypeAbonnement.findAndCountAll({
+            limit,
+            offset,
+            order: [[sortBy, sort]]
+        });
+
+        const totalPages = Math.ceil(count / limit);
+
+        res.json({
+            data: types,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                totalPages
+            }
+        });
     } catch (error) {
         next(error);
     }
@@ -15,8 +37,85 @@ export const getAllTypesAbonnement = async (req: Request, res: Response, next: N
 export const getTypeAbonnementById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const type = await TypeAbonnement.findByPk(req.params.id);
-        if (!type) return res.status(404).json({ message: 'Type d\'abonnement introuvable' });
+        if (!type) {
+            return res.status(404).json({ message: 'Type d\'abonnement introuvable' });
+        }
         res.json(type);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Rechercher des types d'abonnement
+export const searchTypesAbonnement = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { 
+            nom_type, 
+            prix_min, 
+            prix_max, 
+            duree_min, 
+            duree_max,
+            page: pageParam,
+            limit: limitParam,
+            sortBy = 'id_type_abonnement',
+            sort = 'asc'
+        } = req.query;
+
+        // Construire la clause WHERE
+        const whereClause: any = {};
+
+        if (nom_type) {
+            whereClause.nom_type = { [Op.iLike]: `%${nom_type}%` };
+        }
+
+        // Recherche par prix (fourchette)
+        if (prix_min || prix_max) {
+            whereClause.prix = {};
+            if (prix_min) {
+                whereClause.prix[Op.gte] = parseFloat(prix_min as string);
+            }
+            if (prix_max) {
+                whereClause.prix[Op.lte] = parseFloat(prix_max as string);
+            }
+        }
+
+        // Recherche par durée (fourchette)
+        if (duree_min || duree_max) {
+            whereClause.duree_mois = {};
+            if (duree_min) {
+                whereClause.duree_mois[Op.gte] = parseInt(duree_min as string);
+            }
+            if (duree_max) {
+                whereClause.duree_mois[Op.lte] = parseInt(duree_max as string);
+            }
+        }
+
+        // Pagination
+        const page = Math.max(1, Number(pageParam) || 1);
+        const limit = Math.min(100, Math.max(1, Number(limitParam) || 50));
+        const offset = (page - 1) * limit;
+
+        // Ordre de tri
+        const order: any[] = [[sortBy as string, sort === 'asc' ? 'ASC' : 'DESC']];
+
+        const { count, rows: types } = await TypeAbonnement.findAndCountAll({
+            where: whereClause,
+            limit,
+            offset,
+            order
+        });
+
+        const totalPages = Math.ceil(count / limit);
+
+        res.json({
+            data: types,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                totalPages
+            }
+        });
     } catch (error) {
         next(error);
     }
@@ -25,8 +124,7 @@ export const getTypeAbonnementById = async (req: Request, res: Response, next: N
 // Créer un type d'abonnement
 export const createTypeAbonnement = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { nom_type, prix, duree_mois, description } = req.body;
-        const newType = await TypeAbonnement.create({ nom_type, prix, duree_mois, description });
+        const newType = await TypeAbonnement.create(req.body);
         res.status(201).json(newType);
     } catch (error) {
         next(error);
@@ -37,7 +135,9 @@ export const createTypeAbonnement = async (req: Request, res: Response, next: Ne
 export const updateTypeAbonnement = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const type = await TypeAbonnement.findByPk(req.params.id);
-        if (!type) return res.status(404).json({ message: 'Type d\'abonnement non trouvé' });
+        if (!type) {
+            return res.status(404).json({ message: 'Type d\'abonnement non trouvé' });
+        }
         await type.update(req.body);
         res.json(type);
     } catch (error) {
@@ -49,9 +149,11 @@ export const updateTypeAbonnement = async (req: Request, res: Response, next: Ne
 export const deleteTypeAbonnement = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const type = await TypeAbonnement.findByPk(req.params.id);
-        if (!type) return res.status(404).json({ message: 'Type d\'abonnement non trouvé' });
+        if (!type) {
+            return res.status(404).json({ message: 'Type d\'abonnement non trouvé' });
+        }
         await type.destroy();
-        res.status(204).send();
+        res.json({ message: 'Type d\'abonnement supprimé' });
     } catch (error) {
         next(error);
     }

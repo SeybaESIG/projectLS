@@ -35,7 +35,7 @@ Annonce.init(
         datedepart: { type: DataTypes.DATE, allowNull: true },
         datearrivee: { type: DataTypes.DATE, allowNull: true },
         datepublication: { type: DataTypes.DATE, allowNull: true },
-        statut: { type: DataTypes.STRING(50), allowNull: true },
+        statut: { type: DataTypes.STRING(50), allowNull: true, defaultValue: 'active' },
         titre: { type: DataTypes.STRING(100), allowNull: true },
     },
     { sequelize, timestamps: false, tableName: 'tb_annonces' }

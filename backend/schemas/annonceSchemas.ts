@@ -29,9 +29,9 @@ export const annonceSchemas = {
                 'string.min': 'Le titre doit contenir au moins 5 caractères',
                 'string.max': 'Le titre ne doit pas dépasser 100 caractères'
             }),
-        statut: Joi.string().valid('active', 'inactive', 'completed', 'cancelled').default('active')
+        statut: Joi.string().valid('active', 'vendue').default('active')
             .messages({
-                'any.only': 'Le statut doit être l\'un des suivants : active, inactive, completed, cancelled'
+                'any.only': 'Le statut doit être "active" ou "vendue"'
             })
     }).custom((value, helpers) => {
         // Valider que la date d'arrivée est après la date de départ
@@ -57,7 +57,7 @@ export const annonceSchemas = {
         datedepart: commonSchemas.date.optional(),
         datearrivee: commonSchemas.date.optional(),
         titre: Joi.string().min(5).max(100).optional(),
-        statut: Joi.string().valid('active', 'inactive', 'completed', 'cancelled').optional()
+        statut: Joi.string().valid('active', 'vendue').optional()
     }).min(1).custom((value, helpers) => {
         // Valider la plage de dates si les deux dates sont fournies
         if (value.datedepart && value.datearrivee && value.datedepart >= value.datearrivee) {
@@ -65,6 +65,8 @@ export const annonceSchemas = {
         }
         
         return value;
+    }).messages({
+        'date.arrival': 'La date d\'arrivée doit être postérieure à la date de départ'
     }),
 
     // Schéma de paramètre ID annonce
@@ -79,7 +81,7 @@ export const annonceSchemas = {
         ville_arr: commonSchemas.id.optional(),
         aeroport_dep: commonSchemas.id.optional(),
         aeroport_arr: commonSchemas.id.optional(),
-        statut: Joi.string().valid('active', 'inactive', 'completed', 'cancelled').optional(),
+        statut: Joi.string().valid('active', 'vendue').optional(),
         dateFrom: commonSchemas.date.optional(),
         dateTo: commonSchemas.date.optional(),
         minPrice: Joi.number().positive().precision(2).optional(),

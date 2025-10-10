@@ -185,19 +185,22 @@ ALTER TABLE public.tb_aeroports OWNER TO akslasj;
 --
 
 CREATE TABLE public.tb_annonces (
-                                    id_annon integer NOT NULL,
-                                    id_util integer NOT NULL,
-                                    id_ville_dep integer NOT NULL,
-                                    id_aerodep integer NOT NULL,
-                                    id_ville_arr integer NOT NULL,
-                                    id_aeroarr integer NOT NULL,
-                                    description character varying(255),
-                                    prix numeric(10,2) NOT NULL,
-                                    datedepart date,
-                                    datearrivee date,
-                                    datepublication date,
-                                    statut character varying(50),
-                                    titre character varying(100)
+                                   id_annon integer NOT NULL,
+                                   id_util integer NOT NULL,
+                                   id_ville_dep integer NOT NULL,
+                                   id_aerodep integer NOT NULL,
+                                   id_ville_arr integer NOT NULL,
+                                   id_aeroarr integer NOT NULL,
+                                   description character varying(255),
+                                   prix numeric(10,2) NOT NULL,
+                                   datedepart timestamp without time zone,
+                                   datearrivee timestamp without time zone,
+                                   datepublication timestamp without time zone,
+                                   statut character varying(50) DEFAULT 'active',
+                                   titre character varying(100),
+                                   CONSTRAINT tb_annonces_statut_check CHECK (((statut)::text = ANY (ARRAY[('active'::character varying)::text, ('vendue'::character varying)::text]))),
+                                   CONSTRAINT tb_annonces_dates_check CHECK ((datedepart <= datearrivee)),
+                                   CONSTRAINT tb_annonces_prix_check CHECK ((prix > (0)::numeric))
 );
 
 
@@ -246,9 +249,9 @@ CREATE TABLE public.tb_historique_annonces (
                                                id_aeroarr integer NOT NULL,
                                                description character varying(255),
                                                prix numeric(10,2) NOT NULL,
-                                               datedepart date,
-                                               datearrivee date,
-                                               datepublication date,
+                                               datedepart timestamp without time zone,
+                                               datearrivee timestamp without time zone,
+                                               datepublication timestamp without time zone,
                                                statut character varying(50),
                                                titre character varying(100),
                                                action_histo character varying(10) NOT NULL,
@@ -373,7 +376,9 @@ CREATE TABLE public.tb_types_abonnement (
                                             nom_type character varying(100) NOT NULL,
                                             prix numeric(10,2) NOT NULL,
                                             duree_mois integer NOT NULL,
-                                            description text
+                                            description text,
+                                            CONSTRAINT tb_types_abonnement_prix_check CHECK ((prix > (0)::numeric)),
+                                            CONSTRAINT tb_types_abonnement_duree_check CHECK ((duree_mois > 0))
 );
 
 
