@@ -17,7 +17,8 @@ export class Message extends Model<InferAttributes<Message>, InferCreationAttrib
     declare id_destinataire: ForeignKey<Utilisateur['id_util']>;
     declare id_annon: ForeignKey<number> | null;
     declare contenu: string;
-    declare dateenvoi: Date | null;
+    declare dateenvoi: CreationOptional<Date>;
+    declare url_image: string | null;
 
     declare expediteur?: NonAttribute<Utilisateur>;
     declare destinataire?: NonAttribute<Utilisateur>;
@@ -31,7 +32,8 @@ Message.init(
         id_destinataire: { type: DataTypes.INTEGER, allowNull: false },
         id_annon: { type: DataTypes.INTEGER, allowNull: true },
         contenu: { type: DataTypes.STRING(1000), allowNull: false },
-        dateenvoi: { type: DataTypes.DATE, allowNull: true },
+        dateenvoi: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+        url_image: { type: DataTypes.STRING(500), allowNull: true },
     },
     { sequelize, timestamps: false, tableName: 'tb_messages' }
 );

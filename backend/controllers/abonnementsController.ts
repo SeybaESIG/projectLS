@@ -2,11 +2,42 @@ import type { Request, Response, NextFunction } from 'express';
 import { Abonnement, Utilisateur, TypeAbonnement } from '../models/index.js';
 import { Op } from 'sequelize';
 
-// Récupérer tous les abonnements
+// Récupérer tous les abonnements avec pagination
 export const getAllAbonnements = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const abonnements = await Abonnement.findAll();
-        res.json(abonnements);
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 50));
+        const offset = (page - 1) * limit;
+        const sortBy = (req.query.sortBy as string) || 'date_debut';
+        const sort = ((req.query.sort as string) || 'desc').toUpperCase();
+
+        const { count, rows: abonnements } = await Abonnement.findAndCountAll({
+            limit,
+            offset,
+            order: [[sortBy, sort]],
+            include: [
+                {
+                    model: Utilisateur,
+                    required: false
+                },
+                {
+                    model: TypeAbonnement,
+                    required: false
+                }
+            ]
+        });
+
+        const totalPages = Math.ceil(count / limit);
+
+        res.json({
+            data: abonnements,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                totalPages
+            }
+        });
     } catch (error) {
         next(error);
     }
@@ -15,7 +46,18 @@ export const getAllAbonnements = async (req: Request, res: Response, next: NextF
 // Récupérer un abonnement par son identifiant
 export const getAbonnementById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const abonnement = await Abonnement.findByPk(req.params.id);
+        const abonnement = await Abonnement.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Utilisateur,
+                    required: false
+                },
+                {
+                    model: TypeAbonnement,
+                    required: false
+                }
+            ]
+        });
         if (!abonnement) {
             return res.status(404).json({ message: 'Abonnement non trouvé' });
         }
@@ -25,12 +67,55 @@ export const getAbonnementById = async (req: Request, res: Response, next: NextF
     }
 };
 
+// Récupérer l'abonnement d'un utilisateur spécifique
+export const getAbonnementByUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id_util } = req.params;
+        
+        const abonnement = await Abonnement.findOne({
+            where: { id_util: Number(id_util) },
+            include: [
+                {
+                    model: Utilisateur,
+                    required: false
+                },
+                {
+                    model: TypeAbonnement,
+                    required: false
+                }
+            ]
+        });
+
+        if (!abonnement) {
+            return res.status(404).json({ message: 'Aucun abonnement trouvé pour cet utilisateur' });
+        }
+
+        res.json(abonnement);
+    } catch (error) {
+        next(error);
+    }
+};
+
 // Créer un nouvel abonnement
 export const createAbonnement = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { id_util, id_type_abonnement, date_debut, date_fin } = req.body;
-        const newAbonnement = await Abonnement.create({ id_util, id_type_abonnement, date_debut, date_fin });
-        res.status(201).json(newAbonnement);
+        const newAbonnement = await Abonnement.create(req.body);
+        
+        // Récupérer l'abonnement avec les relations
+        const abonnementComplet = await Abonnement.findByPk(newAbonnement.id_abonnement, {
+            include: [
+                {
+                    model: Utilisateur,
+                    required: false
+                },
+                {
+                    model: TypeAbonnement,
+                    required: false
+                }
+            ]
+        });
+        
+        res.status(201).json(abonnementComplet);
     } catch (error) {
         next(error);
     }
@@ -43,8 +128,24 @@ export const updateAbonnement = async (req: Request, res: Response, next: NextFu
         if (!abonnement) {
             return res.status(404).json({ message: 'Abonnement non trouvé' });
         }
+        
         await abonnement.update(req.body);
-        res.json(abonnement);
+        
+        // Récupérer l'abonnement mis à jour avec les relations
+        const abonnementMisAJour = await Abonnement.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Utilisateur,
+                    required: false
+                },
+                {
+                    model: TypeAbonnement,
+                    required: false
+                }
+            ]
+        });
+        
+        res.json(abonnementMisAJour);
     } catch (error) {
         next(error);
     }
@@ -58,21 +159,28 @@ export const deleteAbonnement = async (req: Request, res: Response, next: NextFu
             return res.status(404).json({ message: 'Abonnement non trouvé' });
         }
         await abonnement.destroy();
-        res.status(204).send();
+        res.json({ message: 'Abonnement supprimé' });
     } catch (error) {
         next(error);
     }
 };
 
-// Rechercher des abonnements (ex: /abonnements/search?user=alice&type=premium&status=active)
-// Paramètres: user (username), type (nom_type), status (actif/expiré), date_debut, date_fin
+// Rechercher des abonnements
 export const searchAbonnements = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { user, type, status, date_debut, date_fin } = req.query;
-        
-        if (!user && !type && !status && !date_debut && !date_fin) {
-            return res.status(400).json({ message: 'Au moins un paramètre de recherche est requis (user, type, status, date_debut, date_fin)' });
-        }
+        const { 
+            user, 
+            type, 
+            status, 
+            date_debut_min, 
+            date_debut_max,
+            date_fin_min,
+            date_fin_max,
+            page: pageParam,
+            limit: limitParam,
+            sortBy = 'date_debut',
+            sort = 'desc'
+        } = req.query;
         
         const whereClause: any = {};
         const includeClause: any[] = [];
@@ -87,17 +195,28 @@ export const searchAbonnements = async (req: Request, res: Response, next: NextF
             }
         }
         
-        // Recherche par date de début
-        if (date_debut) {
-            whereClause.date_debut = { [Op.gte]: new Date(date_debut as string) };
+        // Recherche par plage de date_debut
+        if (date_debut_min || date_debut_max) {
+            whereClause.date_debut = {};
+            if (date_debut_min) {
+                whereClause.date_debut[Op.gte] = new Date(date_debut_min as string);
+            }
+            if (date_debut_max) {
+                whereClause.date_debut[Op.lte] = new Date(date_debut_max as string);
+            }
         }
         
-        // Recherche par date de fin
-        if (date_fin) {
+        // Recherche par plage de date_fin
+        if (date_fin_min || date_fin_max) {
             if (!whereClause.date_fin) {
                 whereClause.date_fin = {};
             }
-            whereClause.date_fin[Op.lte] = new Date(date_fin as string);
+            if (date_fin_min) {
+                whereClause.date_fin[Op.gte] = new Date(date_fin_min as string);
+            }
+            if (date_fin_max) {
+                whereClause.date_fin[Op.lte] = new Date(date_fin_max as string);
+            }
         }
         
         // Recherche par user
@@ -126,12 +245,33 @@ export const searchAbonnements = async (req: Request, res: Response, next: NextF
             includeClause.push(TypeAbonnement);
         }
         
-        const abonnements = await Abonnement.findAll({
-            where: whereClause,
-            include: includeClause
-        });
+        // Pagination
+        const page = Math.max(1, Number(pageParam) || 1);
+        const limit = Math.min(100, Math.max(1, Number(limitParam) || 50));
+        const offset = (page - 1) * limit;
+
+        // Ordre de tri
+        const order: any[] = [[sortBy as string, sort === 'asc' ? 'ASC' : 'DESC']];
         
-        res.json(abonnements);
+        const { count, rows: abonnements } = await Abonnement.findAndCountAll({
+            where: whereClause,
+            include: includeClause,
+            limit,
+            offset,
+            order
+        });
+
+        const totalPages = Math.ceil(count / limit);
+        
+        res.json({
+            data: abonnements,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                totalPages
+            }
+        });
     } catch (error) {
         next(error);
     }

@@ -47,6 +47,9 @@ async function importVilles() {
 
         for (let i = 0; i < records.length; i++) {
             const row = records[i];
+            
+            // Vérifier que row existe
+            if (!row) continue;
 
             // Afficher la progression tous les 100 lignes
             if ((i + 1) % 100 === 0) {
@@ -143,7 +146,7 @@ async function importVilles() {
         const [villesCount] = await sequelize.query('SELECT COUNT(*) as count FROM tb_villes;');
         
         console.log('\n📈 Total de villes dans la base de données:');
-        console.log(`   🏙️  ${villesCount[0].count} villes`);
+        console.log(`   🏙️  ${(villesCount[0] as any)?.count || 0} villes`);
 
         // Afficher quelques exemples
         console.log('\n📋 Exemples de villes créées (10 premières):');

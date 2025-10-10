@@ -22,11 +22,12 @@ import typesAbonnementRouter from './routes/typesAbonnementRoutes.js';
 import historiqueAbonnementsRouter from './routes/historiqueAbonnementsRoutes.js';
 import annoncesRouter from './routes/annoncesRoutes.js';
 import messagesRouter from './routes/messagesRoutes.js';
+import msgLecturesRouter from './routes/msgLecturesRoutes.js';
 import transactionsRouter from './routes/transactionsRoutes.js';
 import paiementsRouter from './routes/paiementsRoutes.js';
 import evaluationsRouter from './routes/evaluationsRoutes.js';
 import historiqueAnnoncesRouter from './routes/historiqueAnnoncesRoutes.js';
-import achatsRouter from './routes/achatsRoutes.js';
+import uploadRouter from './routes/uploadRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -68,11 +69,12 @@ app.use('/api/types_abonnement', typesAbonnementRouter);
 app.use('/api/historique_abonnements', historiqueAbonnementsRouter);
 app.use('/api/annonces', annoncesRouter);
 app.use('/api/messages', messagesRouter);
+app.use('/api/msg_lectures', msgLecturesRouter);
 app.use('/api/transactions', transactionsRouter);
 app.use('/api/paiements', paiementsRouter);
 app.use('/api/evaluations', evaluationsRouter);
 app.use('/api/historique_annonces', historiqueAnnoncesRouter);
-app.use('/api/achats', achatsRouter);
+app.use('/api/upload', uploadRouter);
 
 // // Intercepter les erreurs 404 et transférer au gestionnaire d'erreurs
 app.use((req: Request, res: Response, next: NextFunction) => {

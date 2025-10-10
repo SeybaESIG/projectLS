@@ -9,11 +9,11 @@ import { HistoriqueAbonnement } from './historiqueAbonnement.js';
 import { Annonce } from './annonce.js';
 import { Aeroport } from './aeroport.js';
 import { Message } from './message.js';
+import { MsgLecture } from './msgLecture.js';
 import { Transaction } from './transaction.js';
 import { Paiement } from './paiement.js';
 import { Evaluation } from './evaluation.js';
 import { HistoriqueAnnonce } from './historiqueAnnonce.js';
-import { Achat } from './achat.js';
 
 export function initAssociations(): void {
     // Utilisateur -> Role, Ville
@@ -94,12 +94,14 @@ export function initAssociations(): void {
     HistoriqueAnnonce.belongsTo(Utilisateur, { foreignKey: 'id_util' });
     Utilisateur.hasMany(HistoriqueAnnonce, { foreignKey: 'id_util' });
 
-    // Achat -> Utilisateur, Annonce
-    Achat.belongsTo(Utilisateur, { foreignKey: 'id_util' });
-    Utilisateur.hasMany(Achat, { foreignKey: 'id_util' });
-
-    Achat.belongsTo(Annonce, { foreignKey: 'id_annon' });
-    Annonce.hasMany(Achat, { foreignKey: 'id_annon' });
+    // MsgLecture -> Utilisateur (expediteur et destinataire), Annonce
+    MsgLecture.belongsTo(Utilisateur, { as: 'expediteur', foreignKey: 'id_expediteur' });
+    MsgLecture.belongsTo(Utilisateur, { as: 'destinataire', foreignKey: 'id_destinataire' });
+    MsgLecture.belongsTo(Annonce, { foreignKey: 'id_annon' });
+    
+    Utilisateur.hasMany(MsgLecture, { as: 'lecturesEnvoyees', foreignKey: 'id_expediteur' });
+    Utilisateur.hasMany(MsgLecture, { as: 'lecturesRecues', foreignKey: 'id_destinataire' });
+    Annonce.hasMany(MsgLecture, { foreignKey: 'id_annon' });
 }
 
 

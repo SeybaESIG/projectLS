@@ -16,6 +16,8 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
             return res.status(409).json({ message: 'Ce nom d\'utilisateur est déjà utilisé' });
         } else if (field === 'nom_type') {
             return res.status(409).json({ message: 'Ce nom de type d\'abonnement existe déjà' });
+        } else if (field === 'id_util') {
+            return res.status(409).json({ message: 'Cet utilisateur a déjà un abonnement actif' });
         } else {
             return res.status(409).json({ message: `Le champ ${field} doit être unique` });
         }
