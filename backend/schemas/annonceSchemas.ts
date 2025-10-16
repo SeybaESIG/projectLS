@@ -13,9 +13,18 @@ export const annonceSchemas = {
         id_ville_arr: commonSchemas.id,
         id_aeroarr: commonSchemas.id,
         description: Joi.string().min(10).max(1000).optional()
+            .custom((value, helpers) => {
+                // Validation anti-liens : détecter TOUS les domaines (liens cliquables ET domaines simples)
+                const linkRegex = /(https?:\/\/|www\.|^|\s)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?/gi;
+                if (value && linkRegex.test(value)) {
+                    return helpers.error('string.noLinks');
+                }
+                return value;
+            })
             .messages({
                 'string.min': 'La description doit contenir au moins 10 caractères',
-                'string.max': 'La description ne doit pas dépasser 1000 caractères'
+                'string.max': 'La description ne doit pas dépasser 1000 caractères',
+                'string.noLinks': 'Les liens et adresses web ne sont pas autorisés dans la description'
             }),
         prix: Joi.number().positive().precision(2).required()
             .messages({
@@ -52,7 +61,20 @@ export const annonceSchemas = {
 
     // Schéma de mise à jour d'annonce
     update: Joi.object({
-        description: Joi.string().min(10).max(1000).optional(),
+        description: Joi.string().min(10).max(1000).optional()
+            .custom((value, helpers) => {
+                // Validation anti-liens : détecter TOUS les domaines (liens cliquables ET domaines simples)
+                const linkRegex = /(https?:\/\/|www\.|^|\s)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?/gi;
+                if (value && linkRegex.test(value)) {
+                    return helpers.error('string.noLinks');
+                }
+                return value;
+            })
+            .messages({
+                'string.min': 'La description doit contenir au moins 10 caractères',
+                'string.max': 'La description ne doit pas dépasser 1000 caractères',
+                'string.noLinks': 'Les liens et adresses web ne sont pas autorisés dans la description'
+            }),
         prix: Joi.number().positive().precision(2).optional(),
         datedepart: commonSchemas.date.optional(),
         datearrivee: commonSchemas.date.optional(),

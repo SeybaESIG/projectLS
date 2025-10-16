@@ -6,8 +6,9 @@ import { commonSchemas } from '../middlewares/validation.js';
  */
 export const evaluationSchemas = {
     // Schéma de création d'évaluation
+    // Note: id_util_donne est optionnel car le controller le force automatiquement à l'utilisateur connecté
     create: Joi.object({
-        id_util_donne: commonSchemas.id,
+        id_util_donne: commonSchemas.id.optional(),  // Optionnel car forcé par le controller
         id_util_recoit: commonSchemas.id,
         id_transa: commonSchemas.id,
         note: Joi.number().min(0).max(5).required().custom((value, helpers) => {

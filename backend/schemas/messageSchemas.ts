@@ -6,8 +6,9 @@ import { commonSchemas } from '../middlewares/validation.js';
  */
 export const messageSchemas = {
     // Schéma de création de message
+    // Note: id_expediteur est optionnel car le controller le force automatiquement à l'utilisateur connecté
     create: Joi.object({
-        id_expediteur: commonSchemas.id,
+        id_expediteur: commonSchemas.id.optional(),  // Optionnel car forcé par le controller
         id_destinataire: commonSchemas.id,
         id_annon: commonSchemas.id.optional(),
         contenu: Joi.string().min(1).max(1000).required()
@@ -22,8 +23,8 @@ export const messageSchemas = {
                 'string.max': 'L\'URL ne doit pas dépasser 500 caractères'
             })
     }).custom((value, helpers) => {
-        // Valider que l'expéditeur et le destinataire sont différents
-        if (value.id_expediteur === value.id_destinataire) {
+        // Valider que l'expéditeur et le destinataire sont différents (si id_expediteur est fourni)
+        if (value.id_expediteur && value.id_expediteur === value.id_destinataire) {
             return helpers.error('users.same');
         }
         return value;

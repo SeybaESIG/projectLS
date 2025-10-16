@@ -5,12 +5,17 @@ import paiementsRoutes from '../routes/paiementsRoutes.js';
 import { Paiement, Transaction, Utilisateur, Role, Ville, Pays } from '../models/index.js';
 import { errorHandler } from '../middlewares/errorHandler.js';
 import { initAssociations } from '../models/associations.js';
+import { mockAdminAuthMiddleware } from './helpers/mockAuth.js';
 import { Op } from 'sequelize';
 
 initAssociations();
 
 const app: Application = express();
 app.use(express.json());
+
+// Mock de l'authentification ADMIN pour les tests (route admin only)
+app.use(mockAdminAuthMiddleware);
+
 app.use('/api/paiements', paiementsRoutes);
 app.use(errorHandler);
 

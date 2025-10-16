@@ -1,6 +1,17 @@
 import type { Request, Response, NextFunction } from 'express';
+import type { AuthRequest } from '../middlewares/firebaseAuth.js';
 import { Annonce, Utilisateur } from '../models/index.js';
 import { Op } from 'sequelize';
+
+/**
+ * Helper: Récupérer l'utilisateur connecté par son email Firebase
+ */
+async function getCurrentUser(req: AuthRequest): Promise<Utilisateur | null> {
+    const firebaseEmail = req.user?.email;
+    if (!firebaseEmail) return null;
+    
+    return await Utilisateur.findOne({ where: { email: firebaseEmail } });
+}
 
 // Récupérer toutes les annonces
 export const getAllAnnonces = async (req: Request, res: Response, next: NextFunction) => {
@@ -26,9 +37,22 @@ export const getAnnonceById = async (req: Request, res: Response, next: NextFunc
 };
 
 // Créer une nouvelle annonce
-export const createAnnonce = async (req: Request, res: Response, next: NextFunction) => {
+export const createAnnonce = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const annonce = await Annonce.create(req.body);
+    // Récupérer l'utilisateur connecté
+    const currentUser = await getCurrentUser(req);
+    
+    if (!currentUser) {
+      return res.status(401).json({ error: 'Authentification requise pour créer une annonce' });
+    }
+
+    // Forcer l'id_util à être celui de l'utilisateur connecté (sécurité)
+    const annonceData = {
+      ...req.body,
+      id_util: currentUser.id_util  // L'annonce appartient à l'utilisateur connecté
+    };
+
+    const annonce = await Annonce.create(annonceData);
     res.status(201).json(annonce);
   } catch (error) {
     next(error);
@@ -36,12 +60,29 @@ export const createAnnonce = async (req: Request, res: Response, next: NextFunct
 };
 
 // Mettre à jour une annonce existante
-export const updateAnnonce = async (req: Request, res: Response, next: NextFunction) => {
+export const updateAnnonce = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    // Récupérer l'utilisateur connecté
+    const currentUser = await getCurrentUser(req);
+    
+    if (!currentUser) {
+      return res.status(401).json({ error: 'Authentification requise' });
+    }
+
     const annonce = await Annonce.findByPk(req.params.id);
+    
     if (!annonce) {
       return res.status(404).json({ message: 'Annonce non trouvée' });
     }
+
+    // Vérifier que l'utilisateur est propriétaire de l'annonce
+    if (annonce.id_util !== currentUser.id_util) {
+      return res.status(403).json({ 
+        error: 'Accès interdit', 
+        message: 'Vous ne pouvez modifier que vos propres annonces' 
+      });
+    }
+
     await annonce.update(req.body);
     res.json(annonce);
   } catch (error) {
@@ -50,12 +91,29 @@ export const updateAnnonce = async (req: Request, res: Response, next: NextFunct
 };
 
 // Supprimer une annonce
-export const deleteAnnonce = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteAnnonce = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    // Récupérer l'utilisateur connecté
+    const currentUser = await getCurrentUser(req);
+    
+    if (!currentUser) {
+      return res.status(401).json({ error: 'Authentification requise' });
+    }
+
     const annonce = await Annonce.findByPk(req.params.id);
+    
     if (!annonce) {
       return res.status(404).json({ message: 'Annonce non trouvée' });
     }
+
+    // Vérifier que l'utilisateur est propriétaire de l'annonce
+    if (annonce.id_util !== currentUser.id_util) {
+      return res.status(403).json({ 
+        error: 'Accès interdit', 
+        message: 'Vous ne pouvez supprimer que vos propres annonces' 
+      });
+    }
+
     await annonce.destroy();
     res.json({ message: 'Annonce supprimée' });
   } catch (error) {

@@ -5,6 +5,7 @@ import evaluationsRoutes from '../routes/evaluationsRoutes.js';
 import { Evaluation, Utilisateur, Transaction } from '../models/index.js';
 import { errorHandler } from '../middlewares/errorHandler.js';
 import { initAssociations } from '../models/associations.js';
+import { mockAuthMiddleware } from './helpers/mockAuth.js';
 import { Op } from 'sequelize';
 
 // Initialiser les associations avant les tests
@@ -12,6 +13,10 @@ initAssociations();
 
 const app: Application = express();
 app.use(express.json());
+
+// Mock de l'authentification pour les tests
+app.use(mockAuthMiddleware);
+
 app.use('/api/evaluations', evaluationsRoutes);
 
 // Middleware d'erreur pour les tests
@@ -21,14 +26,24 @@ describe('Evaluations Routes - Integration Tests', () => {
   let testUserId1: number;
   let testUserId2: number;
   let testTransactionId: number;
+  let aliceUserId: number;  // ID de l'utilisateur alice.martin (mocké dans l'auth)
 
   // Setup
   beforeAll(async () => {
-    // Récupérer deux utilisateurs différents
-    const users = await Utilisateur.findAll({ limit: 2 });
-    if (users.length >= 2) {
-      testUserId1 = users[0].get('id_util') as number;
-      testUserId2 = users[1].get('id_util') as number;
+    // Récupérer l'utilisateur alice.martin (celui qui est mocké dans l'authentification)
+    const aliceUser = await Utilisateur.findOne({ where: { email: 'alice.martin@example.com' } });
+    if (aliceUser) {
+      aliceUserId = aliceUser.get('id_util') as number;
+      testUserId1 = aliceUserId;  // Pour compatibilité avec les tests existants
+    }
+
+    // Récupérer un deuxième utilisateur
+    const users = await Utilisateur.findAll({ 
+      where: { email: { [Op.ne]: 'alice.martin@example.com' } }, 
+      limit: 1 
+    });
+    if (users.length >= 1) {
+      testUserId2 = users[0].get('id_util') as number;
     }
 
     // Récupérer une transaction
@@ -100,8 +115,8 @@ describe('Evaluations Routes - Integration Tests', () => {
         return;
       }
 
+      // NE PLUS envoyer id_util_donne car le controller le force automatiquement
       const newEvaluation = {
-        id_util_donne: testUserId1,
         id_util_recoit: testUserId2,
         id_transa: testTransactionId,
         note: 4.5,
@@ -113,7 +128,8 @@ describe('Evaluations Routes - Integration Tests', () => {
         .send(newEvaluation)
         .expect(201);
 
-      expect(response.body.id_util_donne).toBe(testUserId1);
+      // L'id_util_donne est celui de l'utilisateur connecté (alice.martin)
+      expect(response.body.id_util_donne).toBe(aliceUserId);
       expect(response.body.id_util_recoit).toBe(testUserId2);
       expect(parseFloat(response.body.note)).toBe(4.5);
     });
@@ -202,17 +218,18 @@ describe('Evaluations Routes - Integration Tests', () => {
 
   describe('GET /api/evaluations/recues/:id_util', () => {
     it('devrait retourner les évaluations reçues par un utilisateur', async () => {
-      if (!testUserId2) {
+      if (!testUserId1) {
         return;
       }
 
+      // L'utilisateur doit demander SES propres évaluations (alice = testUserId1)
       const response = await request(app)
-        .get(`/api/evaluations/recues/${testUserId2}`)
+        .get(`/api/evaluations/recues/${testUserId1}`)
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
       if (response.body.length > 0) {
-        expect(response.body[0].id_util_recoit).toBe(testUserId2);
+        expect(response.body[0].id_util_recoit).toBe(testUserId1);
       }
     });
 

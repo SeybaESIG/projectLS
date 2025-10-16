@@ -1,8 +1,10 @@
 import { jest } from '@jest/globals';
 import type { Request, Response, NextFunction } from 'express';
+import type { AuthRequest } from '../middlewares/firebaseAuth.js';
 
 const mockFindAll = jest.fn();
 const mockFindByPk = jest.fn();
+const mockFindOne = jest.fn();
 const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockDestroy = jest.fn();
@@ -13,13 +15,15 @@ jest.unstable_mockModule('../models/index.js', () => ({
     findByPk: mockFindByPk,
     create: mockCreate,
   },
-  Utilisateur: {},
+  Utilisateur: {
+    findOne: mockFindOne,
+  },
 }));
 
 const annoncesController = await import('../controllers/annoncesController.js');
 
 describe('Annonces Controller - Unit Tests', () => {
-  let mockRequest: Partial<Request>;
+  let mockRequest: Partial<AuthRequest>;
   let mockResponse: Partial<Response>;
   let mockNext: jest.Mock;
   let mockJson: jest.Mock;
@@ -34,11 +38,25 @@ describe('Annonces Controller - Unit Tests', () => {
       params: {},
       body: {},
       query: {},
+      user: {
+        uid: 'firebase-test-uid',
+        email: 'alice.martin@example.com',
+        email_verified: true
+      }
     };
     mockResponse = {
       json: mockJson,
       status: mockStatus,
     };
+
+    // Mock utilisateur par défaut
+    mockFindOne.mockResolvedValue({
+      id_util: 1,
+      email: 'alice.martin@example.com',
+      username: 'alice.martin',
+      nom: 'Martin',
+      prenom: 'Alice'
+    });
 
     jest.clearAllMocks();
   });
@@ -190,6 +208,7 @@ describe('Annonces Controller - Unit Tests', () => {
     it('devrait mettre à jour une annonce existante', async () => {
       const mockAnnonce = {
         id_annon: 1,
+        id_util: 1,  // Appartient à l'utilisateur connecté mocké
         titre: 'Paris - New York',
         prix: '150.00',
         update: jest.fn().mockResolvedValue(undefined),
@@ -202,7 +221,7 @@ describe('Annonces Controller - Unit Tests', () => {
       mockFindByPk.mockResolvedValue(mockAnnonce);
 
       await annoncesController.updateAnnonce(
-        mockRequest as Request,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -249,6 +268,7 @@ describe('Annonces Controller - Unit Tests', () => {
     it('devrait supprimer une annonce', async () => {
       const mockAnnonce = {
         id_annon: 1,
+        id_util: 1,  // Appartient à l'utilisateur connecté mocké
         destroy: jest.fn().mockResolvedValue(undefined),
       };
 
@@ -256,7 +276,7 @@ describe('Annonces Controller - Unit Tests', () => {
       mockFindByPk.mockResolvedValue(mockAnnonce);
 
       await annoncesController.deleteAnnonce(
-        mockRequest as Request,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -384,5 +404,7 @@ describe('Annonces Controller - Unit Tests', () => {
     });
   });
 });
+
+
 
 

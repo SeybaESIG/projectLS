@@ -17,6 +17,11 @@ jest.unstable_mockModule('../models/index.js', () => ({
   },
 }));
 
+// Mock du service de cache pour bypasser Redis dans les tests
+jest.unstable_mockModule('../services/cacheService.js', () => ({
+  getTypesAbonnementCache: jest.fn((fetchFn: any) => fetchFn()),
+}));
+
 const typesAbosController = await import('../controllers/typesAbosController.js');
 
 describe('Types Abos Controller - Unit Tests', () => {
@@ -265,5 +270,7 @@ describe('Types Abos Controller - Unit Tests', () => {
     });
   });
 });
+
+
 
 

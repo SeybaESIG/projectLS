@@ -1,6 +1,7 @@
 import type {Request, Response, NextFunction} from 'express';
 import { TypeAbonnement } from '../models/index.js';
 import { Op } from 'sequelize';
+import { getTypesAbonnementCache } from '../services/cacheService.js';
 
 // Récupérer tous les types d'abonnement avec pagination
 export const getAllTypesAbonnement = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,11 +12,33 @@ export const getAllTypesAbonnement = async (req: Request, res: Response, next: N
         const sortBy = (req.query.sortBy as string) || 'id_type_abonnement';
         const sort = ((req.query.sort as string) || 'asc').toUpperCase();
 
-        const { count, rows: types } = await TypeAbonnement.findAndCountAll({
-            limit,
-            offset,
-            order: [[sortBy, sort]]
-        });
+        // Cache seulement si c'est la première page sans filtres
+        const isFirstPageDefault = page === 1 && limit === 50 && sortBy === 'id_type_abonnement' && sort === 'ASC';
+        
+        let count: number;
+        let types: any[];
+
+        if (isFirstPageDefault) {
+            // Utiliser le cache pour la requête par défaut (1h)
+            const cached = await getTypesAbonnementCache(() => 
+                TypeAbonnement.findAndCountAll({
+                    limit,
+                    offset,
+                    order: [[sortBy, sort]]
+                })
+            );
+            count = cached.count;
+            types = cached.rows;
+        } else {
+            // Pas de cache pour les requêtes personnalisées
+            const result = await TypeAbonnement.findAndCountAll({
+                limit,
+                offset,
+                order: [[sortBy, sort]]
+            });
+            count = result.count;
+            types = result.rows;
+        }
 
         const totalPages = Math.ceil(count / limit);
 

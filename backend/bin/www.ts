@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+/**
+ * Charger les variables d'environnement en PREMIER
+ */
+import '../init.js';
+
 import app from '../app.js';
 import debugLib from 'debug';
 import https from 'https';

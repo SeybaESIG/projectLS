@@ -1,11 +1,12 @@
 import type { Request, Response, NextFunction } from 'express';
 import { Ville } from '../models/index.js';
 import {Op} from "sequelize";
+import { getVillesCache } from '../services/cacheService.js';
 
-// Récupérer toutes les villes
+// Récupérer toutes les villes (avec cache Redis - 24h)
 export const getAllVilles = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const villes = await Ville.findAll();
+        const villes = await getVillesCache(() => Ville.findAll());
         res.json(villes);
     } catch (error) {
         next(error);

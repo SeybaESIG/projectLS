@@ -1,11 +1,12 @@
 import type { Request, Response, NextFunction } from 'express';
 import { Pays } from '../models/index.js';
 import { Op } from 'sequelize';
+import { getPaysCache } from '../services/cacheService.js';
 
-// Récupérer tous les pays
+// Récupérer tous les pays (avec cache Redis - 24h)
 export const getAllPays = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const pays = await Pays.findAll();
+        const pays = await getPaysCache(() => Pays.findAll());
         res.json(pays);
     } catch (error) {
         next(error);

@@ -1,8 +1,10 @@
 import { jest } from '@jest/globals';
 import type { Request, Response, NextFunction } from 'express';
+import type { AuthRequest } from '../middlewares/firebaseAuth.js';
 
 const mockFindAll = jest.fn();
 const mockFindByPk = jest.fn();
+const mockFindOne = jest.fn();
 const mockFindAndCountAll = jest.fn();
 const mockCreate = jest.fn();
 const mockDestroy = jest.fn();
@@ -14,7 +16,9 @@ jest.unstable_mockModule('../models/index.js', () => ({
     findAndCountAll: mockFindAndCountAll,
     create: mockCreate,
   },
-  Utilisateur: {},
+  Utilisateur: {
+    findOne: mockFindOne,
+  },
   MsgLecture: {
     findAll: jest.fn().mockResolvedValue([]),
   },
@@ -30,7 +34,7 @@ const messagesController = await import('../controllers/messagesController.js');
 const { encryptMessage, decryptMessage } = await import('../services/encryptionService.js');
 
 describe('Messages Controller - Unit Tests', () => {
-  let mockRequest: Partial<Request>;
+  let mockRequest: Partial<AuthRequest>;
   let mockResponse: Partial<Response>;
   let mockNext: jest.Mock;
   let mockJson: jest.Mock;
@@ -45,11 +49,25 @@ describe('Messages Controller - Unit Tests', () => {
       params: {},
       body: {},
       query: {},
+      user: {
+        uid: 'firebase-test-uid',
+        email: 'alice.martin@example.com',
+        email_verified: true
+      }
     };
     mockResponse = {
       json: mockJson,
       status: mockStatus,
     };
+
+    // Mock utilisateur par défaut
+    mockFindOne.mockResolvedValue({
+      id_util: 1,
+      email: 'alice.martin@example.com',
+      username: 'alice.martin',
+      nom: 'Martin',
+      prenom: 'Alice'
+    });
 
     jest.clearAllMocks();
   });
@@ -133,15 +151,17 @@ describe('Messages Controller - Unit Tests', () => {
     it('devrait décrypter le message retourné', async () => {
       const mockMessage = {
         id_msg: 1,
+        id_expediteur: 1,  // L'utilisateur connecté est l'expéditeur
+        id_destinataire: 2,
         contenu: 'encrypted_Message secret',
-        toJSON: function() { return { id_msg: this.id_msg, contenu: this.contenu }; }
+        toJSON: function() { return { id_msg: this.id_msg, id_expediteur: this.id_expediteur, id_destinataire: this.id_destinataire, contenu: this.contenu }; }
       };
 
       mockRequest.params = { id: '1' };
       mockFindByPk.mockResolvedValue(mockMessage);
 
       await messagesController.getMessageById(
-        mockRequest as Request,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -170,6 +190,8 @@ describe('Messages Controller - Unit Tests', () => {
     it('devrait supprimer un message', async () => {
       const mockMessage = {
         id_msg: 1,
+        id_expediteur: 1,  // L'utilisateur connecté est l'expéditeur
+        id_destinataire: 2,
         destroy: jest.fn().mockResolvedValue(undefined),
       };
 
@@ -177,7 +199,7 @@ describe('Messages Controller - Unit Tests', () => {
       mockFindByPk.mockResolvedValue(mockMessage);
 
       await messagesController.deleteMessage(
-        mockRequest as Request,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
@@ -189,5 +211,7 @@ describe('Messages Controller - Unit Tests', () => {
     });
   });
 });
+
+
 
 

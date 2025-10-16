@@ -5,6 +5,7 @@ import historiqueAnnoncesRoutes from '../routes/historiqueAnnoncesRoutes.js';
 import { HistoriqueAnnonce, Annonce, Utilisateur, Ville, Aeroport } from '../models/index.js';
 import { errorHandler } from '../middlewares/errorHandler.js';
 import { initAssociations } from '../models/associations.js';
+import { mockAdminAuthMiddleware } from './helpers/mockAuth.js';
 import { Op } from 'sequelize';
 
 // Initialiser les associations avant les tests
@@ -12,6 +13,10 @@ initAssociations();
 
 const app: Application = express();
 app.use(express.json());
+
+// Mock de l'authentification ADMIN pour les tests (route admin only)
+app.use(mockAdminAuthMiddleware);
+
 app.use('/api/historique_annonces', historiqueAnnoncesRoutes);
 
 // Middleware d'erreur pour les tests
@@ -344,5 +349,7 @@ describe('Historique Annonces Routes - Integration Tests', () => {
     });
   });
 });
+
+
 
 

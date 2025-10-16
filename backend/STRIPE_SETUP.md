@@ -179,3 +179,5 @@ Le statut de la transaction est automatiquement mis à jour en fonction des paie
 - Assurez-vous d'utiliser la bonne clé (test vs live)
 
 
+
+

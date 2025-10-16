@@ -51,4 +51,11 @@ certs/
 *.cert
 *.pem
 
+# Firebase credentials - NE JAMAIS COMMITER
+**/firebase-service-account.json
+config/firebase*.json
+config/gcs-credentials.json
+
 /jest.config.mjs
+logs/*.log
+logs/*.gz

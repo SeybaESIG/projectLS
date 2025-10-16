@@ -5,6 +5,7 @@ import annoncesRoutes from '../routes/annoncesRoutes.js';
 import { Annonce, Utilisateur, Ville, Aeroport } from '../models/index.js';
 import { errorHandler } from '../middlewares/errorHandler.js';
 import { initAssociations } from '../models/associations.js';
+import { mockOptionalAuthMiddleware } from './helpers/mockAuth.js';
 import { Op } from 'sequelize';
 
 // Initialiser les associations avant les tests
@@ -12,6 +13,10 @@ initAssociations();
 
 const app: Application = express();
 app.use(express.json());
+
+// Mock de l'authentification optionnelle pour les tests
+app.use(mockOptionalAuthMiddleware);
+
 app.use('/api/annonces', annoncesRoutes);
 
 // Middleware d'erreur pour les tests
