@@ -1,7 +1,18 @@
 import type { Request, Response, NextFunction } from 'express';
+import type { AuthRequest } from '../middlewares/firebaseAuth.js';
 import { Message, Utilisateur, MsgLecture } from '../models/index.js';
 import { Op } from 'sequelize';
 import { encryptMessage, decryptMessage } from '../services/encryptionService.js';
+
+/**
+ * Helper: Récupérer l'utilisateur connecté par son email Firebase
+ */
+async function getCurrentUser(req: AuthRequest): Promise<Utilisateur | null> {
+    const firebaseEmail = req.user?.email;
+    if (!firebaseEmail) return null;
+    
+    return await Utilisateur.findOne({ where: { email: firebaseEmail } });
+}
 
 /**
  * Décrypte le contenu d'un ou plusieurs messages
@@ -26,16 +37,30 @@ async function decryptMessages(messages: any | any[]): Promise<any | any[]> {
     return isArray ? decrypted : decrypted[0];
 }
 
-// Récupérer tous les messages avec pagination
-export const getAllMessages = async (req: Request, res: Response, next: NextFunction) => {
+// Récupérer tous les messages avec pagination (UNIQUEMENT les messages de l'utilisateur connecté)
+export const getAllMessages = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        // Récupérer l'utilisateur connecté
+        const currentUser = await getCurrentUser(req);
+        
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Authentification requise' });
+        }
+
         const page = Math.max(1, Number(req.query.page) || 1);
         const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 50));
         const offset = (page - 1) * limit;
         const sortBy = (req.query.sortBy as string) || 'dateenvoi';
         const sort = ((req.query.sort as string) || 'desc').toUpperCase();
 
+        // Filtrer: seulement les messages envoyés OU reçus par l'utilisateur connecté
         const { count, rows: messages } = await Message.findAndCountAll({
+            where: {
+                [Op.or]: [
+                    { id_expediteur: currentUser.id_util },
+                    { id_destinataire: currentUser.id_util }
+                ]
+            },
             limit,
             offset,
             order: [[sortBy, sort]],
@@ -65,8 +90,15 @@ export const getAllMessages = async (req: Request, res: Response, next: NextFunc
 };
 
 // Récupérer un message par son ID
-export const getMessageById = async (req: Request, res: Response, next: NextFunction) => {
+export const getMessageById = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        // Récupérer l'utilisateur connecté
+        const currentUser = await getCurrentUser(req);
+        
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Authentification requise' });
+        }
+
         const message = await Message.findByPk(req.params.id, {
             include: [
                 { model: Utilisateur, as: 'expediteur', required: false },
@@ -76,6 +108,14 @@ export const getMessageById = async (req: Request, res: Response, next: NextFunc
         
         if (!message) {
             return res.status(404).json({ message: 'Message non trouvé' });
+        }
+
+        // Vérifier que l'utilisateur est l'expéditeur OU le destinataire
+        if (message.id_expediteur !== currentUser.id_util && message.id_destinataire !== currentUser.id_util) {
+            return res.status(403).json({ 
+                error: 'Accès interdit', 
+                message: 'Vous ne pouvez voir que vos propres messages' 
+            });
         }
 
         // Décrypter le message
@@ -88,15 +128,23 @@ export const getMessageById = async (req: Request, res: Response, next: NextFunc
 };
 
 // Créer un nouveau message (avec encryptage)
-export const createMessage = async (req: Request, res: Response, next: NextFunction) => {
+export const createMessage = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const { contenu, id_expediteur, id_destinataire, id_annon, url_image } = req.body;
+        // Récupérer l'utilisateur connecté
+        const currentUser = await getCurrentUser(req);
+        
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Authentification requise' });
+        }
+
+        const { contenu, id_destinataire, id_annon, url_image } = req.body;
 
         // Encrypter le contenu avant stockage
         const contenuCrypte = await encryptMessage(contenu);
 
+        // Forcer l'id_expediteur à être celui de l'utilisateur connecté (sécurité)
         const newMessage = await Message.create({
-            id_expediteur,
+            id_expediteur: currentUser.id_util,  // L'expéditeur est l'utilisateur connecté
             id_destinataire,
             id_annon,
             contenu: contenuCrypte,
@@ -121,12 +169,29 @@ export const createMessage = async (req: Request, res: Response, next: NextFunct
 };
 
 // Supprimer un message
-export const deleteMessage = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteMessage = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        // Récupérer l'utilisateur connecté
+        const currentUser = await getCurrentUser(req);
+        
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Authentification requise' });
+        }
+
         const message = await Message.findByPk(req.params.id);
+        
         if (!message) {
             return res.status(404).json({ message: 'Message non trouvé' });
         }
+
+        // Vérifier que l'utilisateur est l'expéditeur du message
+        if (message.id_expediteur !== currentUser.id_util) {
+            return res.status(403).json({ 
+                error: 'Accès interdit', 
+                message: 'Vous ne pouvez supprimer que les messages que vous avez envoyés' 
+            });
+        }
+
         await message.destroy();
         res.json({ message: 'Message supprimé' });
     } catch (error) {
@@ -135,12 +200,30 @@ export const deleteMessage = async (req: Request, res: Response, next: NextFunct
 };
 
 // Récupérer une conversation (messages entre 2 utilisateurs pour une annonce)
-export const getConversation = async (req: Request, res: Response, next: NextFunction) => {
+export const getConversation = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        // Récupérer l'utilisateur connecté
+        const currentUser = await getCurrentUser(req);
+        
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Authentification requise' });
+        }
+
         const { id_expediteur, id_destinataire, id_annon, page: pageParam, limit: limitParam } = req.query;
 
         if (!id_expediteur || !id_destinataire) {
             return res.status(400).json({ message: 'id_expediteur et id_destinataire sont requis' });
+        }
+
+        // Vérifier que l'utilisateur connecté est l'un des participants de la conversation
+        const expId = Number(id_expediteur);
+        const destId = Number(id_destinataire);
+        
+        if (currentUser.id_util !== expId && currentUser.id_util !== destId) {
+            return res.status(403).json({ 
+                error: 'Accès interdit', 
+                message: 'Vous ne pouvez voir que vos propres conversations' 
+            });
         }
 
         const page = Math.max(1, Number(pageParam) || 1);

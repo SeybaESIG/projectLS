@@ -11,6 +11,11 @@ jest.unstable_mockModule('../models/index.js', () => ({
   },
 }));
 
+// Mock du service de cache pour bypasser Redis dans les tests
+jest.unstable_mockModule('../services/cacheService.js', () => ({
+  getAeroportsCache: jest.fn((fetchFn: any) => fetchFn()),
+}));
+
 const aeroportsController = await import('../controllers/aeroportsController.js');
 
 describe('Aeroports Controller - Unit Tests', () => {
@@ -102,6 +107,8 @@ describe('Aeroports Controller - Unit Tests', () => {
     });
   });
 });
+
+
 
 
 

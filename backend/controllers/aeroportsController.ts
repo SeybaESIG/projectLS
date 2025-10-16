@@ -1,11 +1,12 @@
 import type { Request, Response, NextFunction } from 'express';
 import { Aeroport } from '../models/index.js';
 import { Op } from 'sequelize';
+import { getAeroportsCache } from '../services/cacheService.js';
 
-// Récupérer tous les aéroports
+// Récupérer tous les aéroports (avec cache Redis - 24h)
 export const getAllAeroports = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const aeroports = await Aeroport.findAll();
+        const aeroports = await getAeroportsCache(() => Aeroport.findAll());
         res.json(aeroports);
     } catch (error) {
         next(error);

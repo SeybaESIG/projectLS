@@ -1,9 +1,11 @@
 import { jest } from '@jest/globals';
 import type { Request, Response, NextFunction } from 'express';
+import type { AuthRequest } from '../middlewares/firebaseAuth.js';
 
 const mockFindAll = jest.fn();
 const mockFindOne = jest.fn();
 const mockFindAndCountAll = jest.fn();
+const mockUtilisateurFindOne = jest.fn();
 const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockDestroy = jest.fn();
@@ -15,14 +17,16 @@ jest.unstable_mockModule('../models/index.js', () => ({
     findAndCountAll: mockFindAndCountAll,
     create: mockCreate,
   },
-  Utilisateur: {},
+  Utilisateur: {
+    findOne: mockUtilisateurFindOne,
+  },
   Transaction: {},
 }));
 
 const evaluationsController = await import('../controllers/evaluationsController.js');
 
 describe('Evaluations Controller - Unit Tests', () => {
-  let mockRequest: Partial<Request>;
+  let mockRequest: Partial<AuthRequest>;
   let mockResponse: Partial<Response>;
   let mockNext: jest.Mock;
   let mockJson: jest.Mock;
@@ -37,11 +41,25 @@ describe('Evaluations Controller - Unit Tests', () => {
       params: {},
       body: {},
       query: {},
+      user: {
+        uid: 'firebase-test-uid',
+        email: 'alice.martin@example.com',
+        email_verified: true
+      }
     };
     mockResponse = {
       json: mockJson,
       status: mockStatus,
     };
+
+    // Mock utilisateur par défaut
+    mockUtilisateurFindOne.mockResolvedValue({
+      id_util: 1,
+      email: 'alice.martin@example.com',
+      username: 'alice.martin',
+      nom: 'Martin',
+      prenom: 'Alice'
+    });
 
     jest.clearAllMocks();
   });
@@ -159,22 +177,22 @@ describe('Evaluations Controller - Unit Tests', () => {
   describe('getEvaluationsRecues', () => {
     it('devrait retourner les évaluations reçues par un utilisateur', async () => {
       const mockEvaluations = [
-        { id_util_donne: 1, id_util_recoit: 2, note: '4.5' },
-        { id_util_donne: 3, id_util_recoit: 2, note: '5.0' },
+        { id_util_donne: 2, id_util_recoit: 1, note: '4.5' },
+        { id_util_donne: 3, id_util_recoit: 1, note: '5.0' },
       ];
 
-      mockRequest.params = { id_util: '2' };
+      mockRequest.params = { id_util: '1' };  // Demande SES propres évaluations (id_util: 1)
       mockFindAll.mockResolvedValue(mockEvaluations);
 
       await evaluationsController.getEvaluationsRecues(
-        mockRequest as Request,
+        mockRequest as AuthRequest,
         mockResponse as Response,
         mockNext
       );
 
       expect(mockFindAll).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id_util_recoit: 2 }
+          where: { id_util_recoit: 1 }
         })
       );
       expect(mockJson).toHaveBeenCalledWith(mockEvaluations);
@@ -228,5 +246,7 @@ describe('Evaluations Controller - Unit Tests', () => {
     });
   });
 });
+
+
 
 

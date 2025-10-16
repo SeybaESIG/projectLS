@@ -190,14 +190,15 @@ describe('Evaluation Schemas Validation', () => {
     });
 
     describe('Champs requis', () => {
-      it('devrait rejeter si id_util_donne manquant', () => {
-        const invalidEvaluation = {
+      it('devrait ACCEPTER si id_util_donne manquant (car forcé par le controller)', () => {
+        const validEvaluation = {
           id_util_recoit: 2,
           id_transa: 5,
           note: 4.5
         };
-        const { error } = evaluationSchemas.create.validate(invalidEvaluation);
-        expect(error).toBeDefined();
+        const { error } = evaluationSchemas.create.validate(validEvaluation);
+        // id_util_donne est maintenant optionnel car le controller le force automatiquement
+        expect(error).toBeUndefined();
       });
 
       it('devrait rejeter si id_util_recoit manquant', () => {

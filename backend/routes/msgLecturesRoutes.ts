@@ -18,3 +18,5 @@ router.get('/', getAllMsgLectures);
 export default router;
 
 
+
+

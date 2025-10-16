@@ -1,6 +1,17 @@
 import type { Request, Response, NextFunction } from 'express';
+import type { AuthRequest } from '../middlewares/firebaseAuth.js';
 import { Evaluation, Utilisateur, Transaction } from '../models/index.js';
 import { Op } from 'sequelize';
+
+/**
+ * Helper: Récupérer l'utilisateur connecté par son email Firebase
+ */
+async function getCurrentUser(req: AuthRequest): Promise<Utilisateur | null> {
+    const firebaseEmail = req.user?.email;
+    if (!firebaseEmail) return null;
+    
+    return await Utilisateur.findOne({ where: { email: firebaseEmail } });
+}
 
 // Récupérer toutes les évaluations avec pagination
 export const getAllEvaluations = async (req: Request, res: Response, next: NextFunction) => {
@@ -67,9 +78,24 @@ export const getEvaluationById = async (req: Request, res: Response, next: NextF
 };
 
 // Récupérer les évaluations reçues par un utilisateur
-export const getEvaluationsRecues = async (req: Request, res: Response, next: NextFunction) => {
+export const getEvaluationsRecues = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        // Récupérer l'utilisateur connecté
+        const currentUser = await getCurrentUser(req);
+        
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Authentification requise' });
+        }
+
         const { id_util } = req.params;
+
+        // Vérifier que l'utilisateur demande SES propres évaluations reçues
+        if (Number(id_util) !== currentUser.id_util) {
+            return res.status(403).json({ 
+                error: 'Accès interdit', 
+                message: 'Vous ne pouvez voir que vos propres évaluations' 
+            });
+        }
 
         const evaluations = await Evaluation.findAll({
             where: { id_util_recoit: Number(id_util) },
@@ -87,9 +113,24 @@ export const getEvaluationsRecues = async (req: Request, res: Response, next: Ne
 };
 
 // Récupérer les évaluations données par un utilisateur
-export const getEvaluationsDonnees = async (req: Request, res: Response, next: NextFunction) => {
+export const getEvaluationsDonnees = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        // Récupérer l'utilisateur connecté
+        const currentUser = await getCurrentUser(req);
+        
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Authentification requise' });
+        }
+
         const { id_util } = req.params;
+
+        // Vérifier que l'utilisateur demande SES propres évaluations données
+        if (Number(id_util) !== currentUser.id_util) {
+            return res.status(403).json({ 
+                error: 'Accès interdit', 
+                message: 'Vous ne pouvez voir que vos propres évaluations' 
+            });
+        }
 
         const evaluations = await Evaluation.findAll({
             where: { id_util_donne: Number(id_util) },
@@ -107,9 +148,22 @@ export const getEvaluationsDonnees = async (req: Request, res: Response, next: N
 };
 
 // Créer une nouvelle évaluation (la note_moyenne se met à jour automatiquement via trigger)
-export const createEvaluation = async (req: Request, res: Response, next: NextFunction) => {
+export const createEvaluation = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const newEvaluation = await Evaluation.create(req.body);
+        // Récupérer l'utilisateur connecté
+        const currentUser = await getCurrentUser(req);
+        
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Authentification requise' });
+        }
+
+        // Forcer id_util_donne à être celui de l'utilisateur connecté (sécurité)
+        const evaluationData = {
+            ...req.body,
+            id_util_donne: currentUser.id_util  // L'évaluation est donnée par l'utilisateur connecté
+        };
+
+        const newEvaluation = await Evaluation.create(evaluationData);
 
         // Récupérer l'évaluation avec les relations
         const evaluationComplete = await Evaluation.findOne({
@@ -132,8 +186,15 @@ export const createEvaluation = async (req: Request, res: Response, next: NextFu
 };
 
 // Supprimer une évaluation (la note_moyenne se met à jour automatiquement via trigger)
-export const deleteEvaluation = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteEvaluation = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        // Récupérer l'utilisateur connecté
+        const currentUser = await getCurrentUser(req);
+        
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Authentification requise' });
+        }
+
         const { id_util_donne, id_util_recoit, id_transa } = req.params;
 
         const evaluation = await Evaluation.findOne({
@@ -146,6 +207,14 @@ export const deleteEvaluation = async (req: Request, res: Response, next: NextFu
 
         if (!evaluation) {
             return res.status(404).json({ message: 'Évaluation non trouvée' });
+        }
+
+        // Vérifier que l'utilisateur est celui qui a donné l'évaluation
+        if (evaluation.id_util_donne !== currentUser.id_util) {
+            return res.status(403).json({ 
+                error: 'Accès interdit', 
+                message: 'Vous ne pouvez supprimer que les évaluations que vous avez données' 
+            });
         }
 
         await evaluation.destroy();

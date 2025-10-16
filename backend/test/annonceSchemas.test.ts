@@ -124,6 +124,103 @@ describe('Annonce Schemas Validation', () => {
         expect(error).toBeDefined();
         expect(error?.message).toMatch(/1000 caractères/i);
       });
+
+      describe('Validation anti-liens', () => {
+        it('devrait rejeter une description avec http://', () => {
+          const annonce = { ...validAnnonce, description: 'Visitez http://example.com pour plus d\'infos' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait rejeter une description avec https://', () => {
+          const annonce = { ...validAnnonce, description: 'Site sécurisé https://secure.example.com' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait rejeter une description avec www.', () => {
+          const annonce = { ...validAnnonce, description: 'Allez sur www.monsite.com pour voir' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait bloquer les domaines simples (.com)', () => {
+          const annonce = { ...validAnnonce, description: 'Mon site est sur monsite.com' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait bloquer les domaines simples (.fr)', () => {
+          const annonce = { ...validAnnonce, description: 'Site français sur monsite.fr' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait bloquer les domaines simples (.org)', () => {
+          const annonce = { ...validAnnonce, description: 'Organisation sur monorg.org' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait bloquer les domaines simples (.net)', () => {
+          const annonce = { ...validAnnonce, description: 'Réseau sur monreseau.net' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait bloquer les domaines simples (.io)', () => {
+          const annonce = { ...validAnnonce, description: 'Tech startup sur monstartup.io' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait bloquer les domaines simples (.app)', () => {
+          const annonce = { ...validAnnonce, description: 'Application sur monapp.app' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait bloquer les domaines simples (.dev)', () => {
+          const annonce = { ...validAnnonce, description: 'Développement sur mondev.dev' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait bloquer les domaines simples (.co.uk)', () => {
+          const annonce = { ...validAnnonce, description: 'Site UK sur monsite.co.uk' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeDefined();
+          expect(error?.message).toMatch(/liens.*autorisés/i);
+        });
+
+        it('devrait accepter une description sans liens', () => {
+          const annonce = { ...validAnnonce, description: 'Description normale sans aucun lien web' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeUndefined();
+        });
+
+        it('devrait accepter une description avec "com" dans un mot normal', () => {
+          const annonce = { ...validAnnonce, description: 'Je communique avec mes amis' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeUndefined();
+        });
+
+        it('devrait accepter une description avec "www" dans un mot normal', () => {
+          const annonce = { ...validAnnonce, description: 'Je suis très créatif et inventif' };
+          const { error } = annonceSchemas.create.validate(annonce);
+          expect(error).toBeUndefined();
+        });
+      });
     });
 
     describe('Titre validation', () => {
@@ -297,6 +394,42 @@ describe('Annonce Schemas Validation', () => {
       const { error } = annonceSchemas.update.validate(update);
       expect(error).toBeDefined();
     });
+
+    describe('Validation anti-liens dans les mises à jour', () => {
+      it('devrait rejeter une mise à jour avec http://', () => {
+        const update = { description: 'Visitez http://example.com pour plus d\'infos' };
+        const { error } = annonceSchemas.update.validate(update);
+        expect(error).toBeDefined();
+        expect(error?.message).toMatch(/liens.*autorisés/i);
+      });
+
+      it('devrait rejeter une mise à jour avec www.', () => {
+        const update = { description: 'Allez sur www.monsite.com pour voir' };
+        const { error } = annonceSchemas.update.validate(update);
+        expect(error).toBeDefined();
+        expect(error?.message).toMatch(/liens.*autorisés/i);
+      });
+
+      it('devrait bloquer une mise à jour avec .com', () => {
+        const update = { description: 'Mon site est sur monsite.com' };
+        const { error } = annonceSchemas.update.validate(update);
+        expect(error).toBeDefined();
+        expect(error?.message).toMatch(/liens.*autorisés/i);
+      });
+
+      it('devrait bloquer une mise à jour avec .fr', () => {
+        const update = { description: 'Site français sur monsite.fr' };
+        const { error } = annonceSchemas.update.validate(update);
+        expect(error).toBeDefined();
+        expect(error?.message).toMatch(/liens.*autorisés/i);
+      });
+
+      it('devrait accepter une mise à jour sans liens', () => {
+        const update = { description: 'Nouvelle description sans liens' };
+        const { error } = annonceSchemas.update.validate(update);
+        expect(error).toBeUndefined();
+      });
+    });
   });
 
   describe('Params Schema', () => {
@@ -400,5 +533,7 @@ describe('Annonce Schemas Validation', () => {
     });
   });
 });
+
+
 
 

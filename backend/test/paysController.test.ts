@@ -11,6 +11,11 @@ jest.unstable_mockModule('../models/index.js', () => ({
   },
 }));
 
+// Mock du service de cache pour bypasser Redis dans les tests
+jest.unstable_mockModule('../services/cacheService.js', () => ({
+  getPaysCache: jest.fn((fetchFn: any) => fetchFn()),
+}));
+
 const paysController = await import('../controllers/paysController.js');
 
 describe('Pays Controller - Unit Tests', () => {
@@ -101,6 +106,8 @@ describe('Pays Controller - Unit Tests', () => {
     });
   });
 });
+
+
 
 
 

@@ -45,11 +45,31 @@ temp/
 *.swp
 *~
 
-# TypeScript source files and source maps
-*.ts
-*.ts.map
-*.js.map
-*.d.ts.map
+# TypeScript compiled files (mais garder les fichiers source .ts)
 *.js
-# Autres
+*.js.map
+*.d.ts
+*.d.ts.map
+
+# Sauf les fichiers de configuration nécessaires
+!jest.config.js
+!webpack.config.js
+!rollup.config.js
+
+# Firebase credentials (sécurité)
+backend/config/firebase-service-account.json
+**/firebase-service-account*.json
+
+# Certificats SSL/TLS
+backend/certs/
+*.cert
+*.pem
+*.key
+
+# Logs spécifiques
+backend/logs/
+
+# Fichiers CSV de données
+backend/AeroportsClean*.csv
+backend/*.csv
 

@@ -218,3 +218,5 @@ AND indexrelname NOT LIKE '%pkey%';
 **✅ Tous les indexes sont maintenant en place ! Performance optimale garantie ! 🚀**
 
 
+
+
