@@ -1,8 +1,8 @@
-# 🚀 Backend - Plateforme de Covoiturage Aérien
+# Backend - Plateforme de Covoiturage Aérien
 
 API REST backend pour une plateforme de mise en relation de voyageurs aériens.
 
-## 📋 Table des matières
+## Table des matières
 
 - [Technologies](#technologies)
 - [Prérequis](#prérequis)
@@ -17,7 +17,7 @@ API REST backend pour une plateforme de mise en relation de voyageurs aériens.
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 
 - **Runtime :** Node.js 20+
 - **Framework :** Express 4
@@ -32,7 +32,7 @@ API REST backend pour une plateforme de mise en relation de voyageurs aériens.
 
 ---
 
-## 📦 Prérequis
+## Prérequis
 
 - Node.js >= 20.0.0
 - PostgreSQL >= 17.0
@@ -40,7 +40,7 @@ API REST backend pour une plateforme de mise en relation de voyageurs aériens.
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### 1. Cloner le projet
 
@@ -90,7 +90,7 @@ npm run import:aeroports
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Variables d'environnement (.env)
 
@@ -115,7 +115,7 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 
 ---
 
-## 🎯 Utilisation
+## Utilisation
 
 ### Démarrage en développement
 
@@ -137,7 +137,7 @@ npm start
 
 ---
 
-## 📁 Structure du projet
+## Structure du projet
 
 ```
 backend/
@@ -164,7 +164,7 @@ backend/
 
 ---
 
-## 🌐 API Endpoints
+## API Endpoints
 
 ### Authentification
 
@@ -211,7 +211,7 @@ backend/
 
 ---
 
-## 🧪 Tests
+## Tests
 
 ### Lancer tous les tests unitaires
 
@@ -219,7 +219,7 @@ backend/
 npm test
 ```
 
-**Résultat actuel :** ✅ 136 tests passent (12 suites)
+**Résultat actuel :** 136 tests passent (12 suites)
 
 ### Lancer les tests d'intégration
 
@@ -253,7 +253,7 @@ npm run test:coverage
 
 ---
 
-## 📜 Scripts disponibles
+## Scripts disponibles
 
 ### Scripts de développement
 
@@ -285,7 +285,7 @@ npm run import:aeroports  # Importer les aéroports depuis CSV
 
 ---
 
-## 🗄️ Base de données
+## Base de données
 
 ### Schéma
 
@@ -335,7 +335,7 @@ Les migrations SQL sont dans `scripts/migrations/` :
 
 ---
 
-## 🔐 Sécurité
+## Sécurité
 
 ### Authentification
 
@@ -357,7 +357,7 @@ Les migrations SQL sont dans `scripts/migrations/` :
 
 ---
 
-## 📚 Documentation du code
+## Documentation du code
 
 ### Modèles (Sequelize)
 
@@ -397,7 +397,7 @@ Ville.hasMany(Aeroport, { foreignKey: 'id_ville' });
 
 ---
 
-## 🐛 Dépannage
+## Dépannage
 
 ### Le serveur ne démarre pas
 
@@ -423,7 +423,7 @@ npm test
 
 ---
 
-## 📝 TODO
+## TODO
 
 - [ ] Activer JWT dans `loginMiddleware.ts`
 - [ ] Créer middleware d'autorisation basé sur rôles
@@ -434,19 +434,19 @@ npm test
 
 ---
 
-## 📄 Licence
+## Licence
 
 Propriétaire - Tous droits réservés
 
 ---
 
-## 👥 Équipe
+## Équipe
 
 Projet réalisé dans le cadre de ProjetLS
 
 ---
 
-## 📞 Support
+## Support
 
 Pour toute question ou problème, veuillez ouvrir une issue.
 
@@ -454,6 +454,10 @@ Pour toute question ou problème, veuillez ouvrir une issue.
 
 **Version :** 1.0.0  
 **Dernière mise à jour :** Octobre 2025
+
+
+
+
 
 
 

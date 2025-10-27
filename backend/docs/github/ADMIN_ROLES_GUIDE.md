@@ -1,10 +1,10 @@
-# 👑 Guide de Gestion des Rôles Admin
+# Guide de Gestion des Rôles Admin
 
-Guide complet pour gérer les rôles administrateurs dans votre application.
+Guide complet pour gérer les rôles administrateurs dans l'application.
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 1. [Architecture des rôles](#architecture-des-rôles)
 2. [Routes protégées par rôle](#routes-protégées-par-rôle)
@@ -14,13 +14,13 @@ Guide complet pour gérer les rôles administrateurs dans votre application.
 
 ---
 
-## 🏗️ Architecture des rôles
+## Architecture des rôles
 
 ### 3 niveaux de sécurité
 
 ```
 ┌─────────────────────────────────────────┐
-│  1️⃣  ROUTES PUBLIQUES                   │
+│  1. ROUTES PUBLIQUES                     │
 │  Sans authentification ou optionnelle   │
 │  - /api/pays                            │
 │  - /api/villes                          │
@@ -29,7 +29,7 @@ Guide complet pour gérer les rôles administrateurs dans votre application.
 └─────────────────────────────────────────┘
               ▼
 ┌─────────────────────────────────────────┐
-│  2️⃣  ROUTES AUTHENTIFIÉES               │
+│  2. ROUTES AUTHENTIFIÉES                 │
 │  Token Firebase requis                  │
 │  - /api/users                           │
 │  - /api/abonnements                     │
@@ -41,7 +41,7 @@ Guide complet pour gérer les rôles administrateurs dans votre application.
 └─────────────────────────────────────────┘
               ▼
 ┌─────────────────────────────────────────┐
-│  3️⃣  ROUTES ADMIN UNIQUEMENT            │
+│  3. ROUTES ADMIN UNIQUEMENT              │
 │  Token Firebase + rôle 'admin'          │
 │  - /api/roles                           │
 │  - /api/types_abonnement                │
@@ -57,7 +57,7 @@ Guide complet pour gérer les rôles administrateurs dans votre application.
 
 ---
 
-## 🔐 Routes protégées par rôle
+## Routes protégées par rôle
 
 ### Routes publiques (sans authentification)
 
@@ -79,19 +79,19 @@ GET    /api/evaluations          # Voir les évaluations
 POST   /api/upload               # Uploader une image
 ```
 
-### Routes admin uniquement ⚠️
+### Routes admin uniquement
 
 ```
-GET    /api/roles                        # 👑 Gérer les rôles
-POST   /api/roles                        # 👑 Créer un rôle
+GET    /api/roles                        # Gérer les rôles
+POST   /api/roles                        # Créer un rôle
 
-GET    /api/types_abonnement             # 👑 Types d'abonnements
-POST   /api/types_abonnement             # 👑 Créer un type
-PUT    /api/types_abonnement/:id         # 👑 Modifier un type
-DELETE /api/types_abonnement/:id         # 👑 Supprimer un type
+GET    /api/types_abonnement             # Types d'abonnements
+POST   /api/types_abonnement             # Créer un type
+PUT    /api/types_abonnement/:id         # Modifier un type
+DELETE /api/types_abonnement/:id         # Supprimer un type
 
-GET    /api/historique_abonnements       # 👑 Historique complet
-GET    /api/historique_annonces          # 👑 Historique complet
+GET    /api/historique_abonnements       # Historique complet
+GET    /api/historique_annonces          # Historique complet
 ```
 
 **Réponse si non-admin :**
@@ -104,7 +104,7 @@ GET    /api/historique_annonces          # 👑 Historique complet
 
 ---
 
-## 🛠️ Gestion des admins
+## Gestion des admins
 
 ### 1. Définir un utilisateur comme admin
 
@@ -117,16 +117,16 @@ npm run set-admin <firebase_uid>
 npm run set-admin abc123xyz456
 
 # Sortie :
-# 🔄 Définition du rôle admin pour l'utilisateur abc123xyz456...
+# Définition du rôle admin pour l'utilisateur abc123xyz456...
 # 
-# ✅ Rôle admin défini avec succès !
+# Rôle admin défini avec succès.
 # 
 # Informations utilisateur :
 #   - UID: abc123xyz456
 #   - Email: admin@example.com
 #   - Rôle: admin
 # 
-# ⚠️  Note: L'utilisateur doit se reconnecter pour que le nouveau rôle soit actif.
+# Note: L'utilisateur doit se reconnecter pour que le nouveau rôle soit actif.
 ```
 
 ### 2. Retirer le rôle admin
@@ -140,9 +140,9 @@ npm run remove-admin <firebase_uid>
 npm run remove-admin abc123xyz456
 
 # Sortie :
-# 🔄 Retrait du rôle admin pour l'utilisateur abc123xyz456...
+# Retrait du rôle admin pour l'utilisateur abc123xyz456...
 # 
-# ✅ Rôle admin retiré avec succès !
+# Rôle admin retiré avec succès.
 # 
 # Informations utilisateur :
 #   - UID: abc123xyz456
@@ -158,23 +158,23 @@ npm run list-users
 
 **Exemple de sortie :**
 ```
-📋 Liste des utilisateurs Firebase
+Liste des utilisateurs Firebase
 
 ────────────────────────────────────────────────────────────────────────────────
-   👑 ADMIN
+   ADMIN
    UID:      abc123xyz456
-   Email:    admin@example.com ✅
+   Email:    admin@example.com
    Créé:     01/10/2025
    Dernière: 13/10/2025
 ────────────────────────────────────────────────────────────────────────────────
-   👤 USER
+   USER
    UID:      def789ghi012
-   Email:    user@example.com ✅
+   Email:    user@example.com
    Créé:     05/10/2025
    Dernière: 12/10/2025
 ────────────────────────────────────────────────────────────────────────────────
 
-📊 Statistiques:
+Statistiques:
    Total utilisateurs: 2
    Admins: 1
    Users: 1
@@ -182,7 +182,7 @@ npm run list-users
 
 ---
 
-## 💡 Exemples d'utilisation
+## Exemples d'utilisation
 
 ### Exemple 1 : Utilisateur normal tente d'accéder à une route admin
 
@@ -233,10 +233,10 @@ export const someController = async (req: AuthRequest, res: Response) => {
     
     if (userRole === 'admin') {
         // Fonctionnalité admin
-        console.log('✅ Admin détecté');
+        console.log('Admin détecté');
     } else {
         // Fonctionnalité utilisateur standard
-        console.log('👤 Utilisateur standard');
+        console.log('Utilisateur standard');
     }
     
     res.json({ role: userRole });
@@ -245,16 +245,16 @@ export const someController = async (req: AuthRequest, res: Response) => {
 
 ---
 
-## 🔒 Sécurité
+## Sécurité
 
 ### Custom Claims Firebase
 
 Les rôles sont stockés dans les **Custom Claims** de Firebase, ce qui signifie :
 
-- ✅ **Sécurisé** : Impossible de falsifier (vérifié par Firebase)
-- ✅ **Inclus dans le token** : Pas de requête DB supplémentaire
-- ✅ **Côté serveur** : Seul le backend peut modifier les rôles
-- ⚠️ **Cache** : L'utilisateur doit se reconnecter après un changement de rôle
+- **Sécurisé** : Impossible de falsifier (vérifié par Firebase)
+- **Inclus dans le token** : Pas de requête DB supplémentaire
+- **Côté serveur** : Seul le backend peut modifier les rôles
+- **Cache** : L'utilisateur doit se reconnecter après un changement de rôle
 
 ### Vérification côté serveur
 
@@ -295,7 +295,7 @@ export function requireRole(...allowedRoles: string[]) {
 
 ---
 
-## 🚀 Déploiement
+## Déploiement
 
 ### Créer le premier admin
 
@@ -319,7 +319,7 @@ export function requireRole(...allowedRoles: string[]) {
 
 ---
 
-## 📊 Résumé
+## Résumé
 
 | Action | Commande | Exemple |
 |--------|----------|---------|
@@ -329,7 +329,7 @@ export function requireRole(...allowedRoles: string[]) {
 
 ---
 
-## ❓ FAQ
+## FAQ
 
 ### Q: Comment obtenir l'UID d'un utilisateur ?
 
@@ -357,7 +357,11 @@ router.delete('/users/:id',
 
 ---
 
-**🎉 Votre système de rôles est maintenant configuré !**
+**Le système de rôles est configuré et opérationnel.**
+
+
+
+
 
 
 

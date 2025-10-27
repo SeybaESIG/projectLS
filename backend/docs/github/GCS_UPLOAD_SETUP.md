@@ -1,16 +1,16 @@
-# 📸 Configuration Google Cloud Storage pour les Uploads d'Images
+# Configuration Google Cloud Storage pour les Uploads d'Images
 
-## 🎯 Vue d'ensemble
+## Vue d'ensemble
 
 Le système d'upload d'images utilise **Google Cloud Storage (GCS)** avec des **Signed URLs** pour permettre aux utilisateurs d'uploader des images **directement vers GCS** sans passer par le serveur backend.
 
-**✅ Limite de taille : 5 Mo par fichier**  
-**✅ Types autorisés : JPEG, PNG, GIF, WEBP**  
-**✅ Validation backend + GCS (double sécurité)**
+- **Limite de taille :** 5 Mo par fichier
+- **Types autorisés :** JPEG, PNG, GIF, WEBP
+- **Sécurité :** Validation multi-couches (frontend, backend, GCS)
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### 1. Créer un compte Google Cloud
 
@@ -29,7 +29,7 @@ gsutil mb -p YOUR_PROJECT_ID -c STANDARD -l europe-west1 -b on gs://your-bucket-
 
 **Configuration du bucket** :
 - **Nom** : `your-app-images` (doit être unique globalement)
-- **Région** : europe-west1 (proche de tes utilisateurs)
+- **Région** : europe-west1 (proche des utilisateurs)
 - **Classe de stockage** : Standard
 - **Accès public** : Désactiver (utiliser des URLs signées)
 
@@ -61,7 +61,7 @@ gsutil cors set cors-config.json gs://your-bucket-name/
 
 ### 5. Configurer les variables d'environnement
 
-Ajoutez dans `.env` :
+Ajouter dans `.env` :
 
 ```bash
 # Google Cloud Storage
@@ -70,7 +70,7 @@ GCS_PROJECT_ID=your-project-id
 GCS_CREDENTIALS_PATH=./credentials.json
 ```
 
-**⚠️ IMPORTANT** : Ajoutez `credentials.json` dans `.gitignore` !
+**Important** : Ajouter `credentials.json` dans `.gitignore` pour éviter de commiter les credentials.
 
 ```bash
 echo "credentials.json" >> .gitignore
@@ -78,7 +78,7 @@ echo "credentials.json" >> .gitignore
 
 ---
 
-## 🔄 Flow d'upload (3 requêtes)
+## Flow d'upload (3 requêtes)
 
 ### **Requête 1 : Demander une Signed URL**
 
@@ -103,9 +103,9 @@ const { signedUrl, publicUrl, maxSize } = await response.json();
 ```
 
 **Backend** :
-- ✅ Valide le type de fichier
-- ✅ Génère une Signed URL avec **limite de 5 Mo**
-- ✅ URL expire dans 15 minutes
+- Valide le type de fichier
+- Génère une Signed URL avec limite de 5 Mo
+- URL expire dans 15 minutes
 
 ---
 
@@ -140,10 +140,10 @@ if (!uploadResponse.ok) {
 ```
 
 **GCS** :
-- ✅ Valide que la taille < 5 Mo
-- ✅ Valide que le type MIME correspond
-- ✅ Stocke l'image
-- ❌ Refuse si fichier > 5 Mo (erreur 413)
+- Valide que la taille < 5 Mo
+- Valide que le type MIME correspond
+- Stocke l'image
+- Refuse si fichier > 5 Mo (erreur 413)
 
 ---
 
@@ -164,12 +164,12 @@ await fetch('/api/messages', {
 ```
 
 **Backend** :
-- ✅ Valide que `url_image` est une URL valide (Joi)
-- ✅ Enregistre le message avec l'URL
+- Valide que `url_image` est une URL valide (Joi)
+- Enregistre le message avec l'URL
 
 ---
 
-## 🛡️ Sécurité (Triple validation)
+## Sécurité (Validation multi-couches)
 
 ### **Validation 1 : Frontend (UX)**
 ```javascript
@@ -182,20 +182,20 @@ if (file.size > 5 * 1024 * 1024) {
 ### **Validation 2 : Backend (Signed URL)**
 ```typescript
 conditions: [
-  ['content-length-range', 0, 5242880], // MAX 5 Mo ✅
-  ['eq', '$Content-Type', 'image/jpeg'] // Type strict ✅
+  ['content-length-range', 0, 5242880], // MAX 5 Mo
+  ['eq', '$Content-Type', 'image/jpeg'] // Type strict
 ]
 ```
 
 ### **Validation 3 : GCS (automatique)**
-- GCS refuse automatiquement si :
-  - Fichier > 5 Mo
-  - Type MIME différent
-  - URL expirée (> 15 min)
+GCS refuse automatiquement si :
+- Fichier > 5 Mo
+- Type MIME différent
+- URL expirée (> 15 min)
 
 ---
 
-## 📋 Routes disponibles
+## Routes disponibles
 
 ### `POST /api/upload/signed-url`
 
@@ -237,13 +237,13 @@ conditions: [
 
 ---
 
-## 🧪 Tests
+## Tests
 
 **Tests créés** :
-- ✅ `uploadSchemas.test.ts` - 11 tests
-- ✅ Validation des types de fichiers
-- ✅ Validation des tailles de nom
-- ✅ Validation des catégories
+- `uploadSchemas.test.ts` - 11 tests
+- Validation des types de fichiers
+- Validation des tailles de nom
+- Validation des catégories
 
 **Lancer les tests** :
 ```bash
@@ -252,7 +252,7 @@ npm test test/uploadSchemas.test.ts
 
 ---
 
-## 💡 Exemple Frontend complet
+## Exemple Frontend complet
 
 ```javascript
 // Composant d'upload d'image
@@ -331,35 +331,31 @@ if (imageUrl) {
 
 ---
 
-## 🆘 Dépannage
+## Dépannage
 
 ### Erreur : "Service de stockage non configuré"
-- Vérifiez que `GCS_BUCKET_NAME`, `GCS_PROJECT_ID`, `GCS_CREDENTIALS_PATH` sont dans `.env`
-- Vérifiez que le fichier `credentials.json` existe au bon endroit
+- Vérifier que `GCS_BUCKET_NAME`, `GCS_PROJECT_ID`, `GCS_CREDENTIALS_PATH` sont dans `.env`
+- Vérifier que le fichier `credentials.json` existe au bon endroit
 
 ### Erreur : "Permission denied"
-- Vérifiez que le Service Account a le rôle **Storage Object Admin**
-- Vérifiez que les credentials sont valides
+- Vérifier que le Service Account a le rôle **Storage Object Admin**
+- Vérifier que les credentials sont valides
 
 ### Erreur 413 côté GCS
 - Le fichier dépasse 5 Mo
-- C'est **normal** et **sécurisé** (validation GCS)
+- Comportement attendu (validation GCS)
 
 ### CORS errors
-- Vérifiez que votre frontend URL est dans la config CORS du bucket
-- Utilisez `gsutil cors get gs://your-bucket/` pour vérifier
+- Vérifier que l'URL du frontend est dans la config CORS du bucket
+- Utiliser `gsutil cors get gs://your-bucket/` pour vérifier
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - [GCS Signed URLs](https://cloud.google.com/storage/docs/access-control/signed-urls)
 - [GCS CORS](https://cloud.google.com/storage/docs/configuring-cors)
 - [Storage Object Admin role](https://cloud.google.com/storage/docs/access-control/iam-roles)
-
----
-
-**✅ Upload d'images avec limite de 5 Mo : IMPLÉMENTÉ !**
 
 
 

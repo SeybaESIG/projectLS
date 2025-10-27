@@ -65,6 +65,18 @@ pool: {
 }
 ```
 
+### Pourquoi c'est important
+
+**Sans pool** :
+- Ouvre/ferme une connexion à chaque requête (lent)
+- Limite du nombre de connexions DB dépassée
+- Timeouts fréquents sous charge
+
+**Avec pool** :
+- Réutilise les connexions (rapide)
+- Limite le nombre de connexions
+- Connexions prêtes instantanément
+
 ### Monitoring du pool
 
 ```typescript

@@ -1,10 +1,10 @@
-# 🔐 Permissions API - Guide Complet
+# Permissions API - Guide Complet
 
 Documentation complète des permissions et accès aux différentes routes de l'API.
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 1. [Vue d'ensemble](#vue-densemble)
 2. [Routes publiques](#routes-publiques)
@@ -15,27 +15,27 @@ Documentation complète des permissions et accès aux différentes routes de l'A
 
 ---
 
-## 🎯 Vue d'ensemble
+## Vue d'ensemble
 
 ### 3 niveaux de sécurité
 
 ```
-🌐 PUBLIC
+PUBLIC
    ↓
-🔐 UTILISATEUR AUTHENTIFIÉ
+UTILISATEUR AUTHENTIFIÉ
    ↓
-👑 ADMIN
+ADMIN
 ```
 
-| Niveau | Icône | Accès | Vérification |
-|--------|-------|-------|--------------|
-| **Public** | 🌐 | Tout le monde | Aucune |
-| **Authentifié** | 🔐 | Token Firebase requis | Email Firebase |
-| **Admin** | 👑 | Token Firebase + rôle 'admin' | Custom claim |
+| Niveau | Accès | Vérification |
+|--------|-------|--------------|
+| **Public** | Tout le monde | Aucune |
+| **Authentifié** | Token Firebase requis | Email Firebase |
+| **Admin** | Token Firebase + rôle 'admin' | Custom claim |
 
 ---
 
-## 🌐 Routes publiques
+## Routes publiques
 
 ### Sans authentification
 
@@ -48,20 +48,20 @@ Documentation complète des permissions et accès aux différentes routes de l'A
 
 | Méthode | Route | Description | Auth requise |
 |---------|-------|-------------|--------------|
-| `GET` | `/api/pays` | Liste des pays | ❌ Non |
-| `GET` | `/api/villes` | Liste des villes | ❌ Non |
-| `GET` | `/api/aeroports` | Liste des aéroports | ❌ Non |
-| `GET` | `/api/annonces` | Liste des annonces | ❌ Non |
-| `GET` | `/api/annonces/:id` | Détails d'une annonce | ❌ Non |
-| `POST` | `/api/annonces` | Créer une annonce | ✅ **Oui** |
-| `PATCH` | `/api/annonces/:id` | Modifier son annonce | ✅ **Oui** |
-| `DELETE` | `/api/annonces/:id` | Supprimer son annonce | ✅ **Oui** |
+| `GET` | `/api/pays` | Liste des pays | Non |
+| `GET` | `/api/villes` | Liste des villes | Non |
+| `GET` | `/api/aeroports` | Liste des aéroports | Non |
+| `GET` | `/api/annonces` | Liste des annonces | Non |
+| `GET` | `/api/annonces/:id` | Détails d'une annonce | Non |
+| `POST` | `/api/annonces` | Créer une annonce | **Oui** |
+| `PATCH` | `/api/annonces/:id` | Modifier son annonce | **Oui** |
+| `DELETE` | `/api/annonces/:id` | Supprimer son annonce | **Oui** |
 
 **Note** : Pour les annonces, la lecture est publique mais les actions CRUD nécessitent une authentification.
 
 ---
 
-## 🔐 Routes utilisateurs authentifiés
+## Routes utilisateurs authentifiés
 
 **Authentification requise** : Header `Authorization: Bearer <firebase_token>`
 
@@ -158,7 +158,7 @@ Documentation complète des permissions et accès aux différentes routes de l'A
 
 ---
 
-## 👑 Routes admin uniquement
+## Routes admin uniquement
 
 **Authentification requise** : Header `Authorization: Bearer <firebase_token>` + Custom claim `role: 'admin'`
 
@@ -230,36 +230,36 @@ Documentation complète des permissions et accès aux différentes routes de l'A
 
 ---
 
-## 📊 Matrice des permissions
+## Matrice des permissions
 
-| Action | 🌐 Public | 🔐 User | 👑 Admin |
-|--------|-----------|---------|----------|
-| **Voir les annonces** | ✅ | ✅ | ✅ |
-| **Créer une annonce** | ❌ | ✅ (à son nom) | ✅ |
-| **Modifier une annonce** | ❌ | ✅ (les siennes) | ✅ (toutes) |
-| **Supprimer une annonce** | ❌ | ✅ (les siennes) | ✅ (toutes) |
-| **Voir son profil** | ❌ | ✅ (le sien via `/me`) | ✅ (tous) |
-| **Modifier son profil** | ❌ | ✅ (le sien via `/me`) | ✅ (tous) |
-| **Voir tous les users** | ❌ | ❌ | ✅ |
-| **Voir ses messages** | ❌ | ✅ (les siens) | ✅ (tous) |
-| **Envoyer un message** | ❌ | ✅ | ✅ |
-| **Supprimer un message** | ❌ | ✅ (envoyés uniquement) | ✅ (tous) |
-| **Voir ses évaluations** | ❌ | ✅ (les siennes) | ✅ (toutes) |
-| **Donner une évaluation** | ❌ | ✅ | ✅ |
-| **Voir les abonnements** | ❌ | ✅ (types disponibles) | ✅ (tous) |
-| **Souscrire un abonnement** | ❌ | ✅ (pour soi) | ✅ |
-| **Résilier un abonnement** | ❌ | ✅ (le sien) | ✅ (tous) |
-| **Effectuer un paiement** | ❌ | ✅ (via `/payer`) | ✅ |
-| **Voir tous les paiements** | ❌ | ❌ | ✅ |
-| **Modifier un paiement** | ❌ | ❌ | ✅ |
-| **Voir les transactions** | ❌ | ❌ | ✅ |
-| **Gérer les rôles** | ❌ | ❌ | ✅ |
-| **Gérer types abonnements** | ❌ | ❌ | ✅ |
-| **Voir historiques** | ❌ | ❌ | ✅ |
+| Action | Public | User | Admin |
+|--------|--------|------|-------|
+| **Voir les annonces** | ✓ | ✓ | ✓ |
+| **Créer une annonce** | ✗ | ✓ (à son nom) | ✓ |
+| **Modifier une annonce** | ✗ | ✓ (les siennes) | ✓ (toutes) |
+| **Supprimer une annonce** | ✗ | ✓ (les siennes) | ✓ (toutes) |
+| **Voir son profil** | ✗ | ✓ (le sien via `/me`) | ✓ (tous) |
+| **Modifier son profil** | ✗ | ✓ (le sien via `/me`) | ✓ (tous) |
+| **Voir tous les users** | ✗ | ✗ | ✓ |
+| **Voir ses messages** | ✗ | ✓ (les siens) | ✓ (tous) |
+| **Envoyer un message** | ✗ | ✓ | ✓ |
+| **Supprimer un message** | ✗ | ✓ (envoyés uniquement) | ✓ (tous) |
+| **Voir ses évaluations** | ✗ | ✓ (les siennes) | ✓ (toutes) |
+| **Donner une évaluation** | ✗ | ✓ | ✓ |
+| **Voir les abonnements** | ✗ | ✓ (types disponibles) | ✓ (tous) |
+| **Souscrire un abonnement** | ✗ | ✓ (pour soi) | ✓ |
+| **Résilier un abonnement** | ✗ | ✓ (le sien) | ✓ (tous) |
+| **Effectuer un paiement** | ✗ | ✓ (via `/payer`) | ✓ |
+| **Voir tous les paiements** | ✗ | ✗ | ✓ |
+| **Modifier un paiement** | ✗ | ✗ | ✓ |
+| **Voir les transactions** | ✗ | ✗ | ✓ |
+| **Gérer les rôles** | ✗ | ✗ | ✓ |
+| **Gérer types abonnements** | ✗ | ✗ | ✓ |
+| **Voir historiques** | ✗ | ✗ | ✓ |
 
 ---
 
-## 🔒 Sécurité et vérifications
+## Sécurité et vérifications
 
 ### Vérifications automatiques dans les controllers
 
@@ -312,7 +312,7 @@ utilisateur = findOne({ where: { email: firebaseEmail } });
 
 ---
 
-## 🚦 Codes de réponse HTTP
+## Codes de réponse HTTP
 
 | Code | Signification | Quand ? |
 |------|---------------|---------|
@@ -327,7 +327,7 @@ utilisateur = findOne({ where: { email: firebaseEmail } });
 
 ---
 
-## 💡 Exemples
+## Exemples
 
 ### Exemple 1 : Utilisateur crée une annonce
 
@@ -454,7 +454,7 @@ if (req.user.firebase.role !== 'admin') {
 
 ---
 
-## 🛡️ Sécurité
+## Sécurité
 
 ### Lien Firebase ↔ Base de données
 
@@ -489,7 +489,7 @@ tb_utilisateurs (Base de données)
 
 ---
 
-## ⚠️ Cas d'erreur courants
+## Cas d'erreur courants
 
 ### 1. Utilisateur non trouvé dans la DB
 
@@ -527,7 +527,7 @@ tb_utilisateurs (Base de données)
 
 ---
 
-## 📚 Documentation liée
+## Documentation liée
 
 - **Firebase Authentication** : [FIREBASE_AUTH_SETUP.md](./FIREBASE_AUTH_SETUP.md)
 - **Gestion des rôles admin** : [ADMIN_ROLES_GUIDE.md](./ADMIN_ROLES_GUIDE.md)
@@ -535,7 +535,11 @@ tb_utilisateurs (Base de données)
 
 ---
 
-**🎉 Système de permissions complet et sécurisé !**
+**Système de permissions complet et sécurisé.**
+
+
+
+
 
 
 
