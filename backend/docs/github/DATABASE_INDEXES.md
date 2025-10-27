@@ -1,14 +1,14 @@
-# 📊 Liste complète des indexes de la base de données
+# Liste complète des indexes de la base de données
 
 ## Résumé
 
-- **Total indexes explicites** : **48 indexes** ✅
-- **Tables avec indexes** : **15/15** ✅
+- **Total indexes explicites** : 48 indexes
+- **Tables avec indexes** : 15/15
 - **Coverage** : 100%
 
 ---
 
-## 📋 Indexes par table
+## Indexes par table
 
 ### 1. **tb_roles** (1 index)
 - `idx_roles_nom` → `nom_role`
@@ -33,7 +33,7 @@
 - `idx_utilisateurs_note_moyenne` → `note_moyenne DESC`
 - *(+ UNIQUE auto: email, tel, username)*
 
-### 6. **tb_annonces** (7 indexes) ⭐
+### 6. **tb_annonces** (7 indexes)
 - `idx_annonces_utilisateur` → `id_util` (FK)
 - `idx_annonces_aerodep` → `id_aerodep` (FK)
 - `idx_annonces_aeroarr` → `id_aeroarr` (FK)
@@ -94,7 +94,7 @@
 
 ---
 
-## 🎯 Types d'indexes
+## Types d'indexes
 
 ### Par catégorie :
 
@@ -114,7 +114,7 @@
 
 ---
 
-## 🚀 Impact Performance
+## Impact Performance
 
 ### Avant indexes (tables sans indexes)
 ```sql
@@ -139,7 +139,7 @@ SELECT * FROM tb_annonces WHERE statut = 'active';
 
 ---
 
-## ✅ Vérification des indexes
+## Vérification des indexes
 
 Pour vérifier les indexes d'une table :
 
@@ -161,9 +161,9 @@ ORDER BY tablename, indexname;
 
 ---
 
-## 📈 Recommandations futures
+## Recommandations futures
 
-### Si l'application grandit (100k+ utilisateurs) :
+### Si l'application grandit (100k+ utilisateurs)
 
 1. **Indexes partiels** (pour optimiser les requêtes fréquentes) :
 ```sql
@@ -188,7 +188,7 @@ USING GIN (to_tsvector('french', titre || ' ' || description));
 
 ---
 
-## ⚠️ Maintenance
+## Maintenance
 
 ### Surveiller les indexes :
 
@@ -215,7 +215,7 @@ AND indexrelname NOT LIKE '%pkey%';
 
 ---
 
-**✅ Tous les indexes sont maintenant en place ! Performance optimale garantie ! 🚀**
+Tous les indexes sont maintenant en place. Performance optimale garantie.
 
 
 

@@ -1,10 +1,10 @@
-# 🔥 Configuration Firebase Authentication
+# Configuration Firebase Authentication
 
-Guide complet pour configurer l'authentification Firebase JWT dans votre backend.
+Guide complet pour configurer l'authentification Firebase JWT dans le backend.
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 1. [Prérequis](#prérequis)
 2. [Configuration Firebase Console](#configuration-firebase-console)
@@ -17,15 +17,15 @@ Guide complet pour configurer l'authentification Firebase JWT dans votre backend
 
 ---
 
-## 🎯 Prérequis
+## Prérequis
 
 - Compte Firebase créé sur [console.firebase.google.com](https://console.firebase.google.com)
 - Node.js >= 20.0.0
-- Package `firebase-admin` installé ✅
+- Package `firebase-admin` installé
 
 ---
 
-## 🔧 Configuration Firebase Console
+## Configuration Firebase Console
 
 ### 1. Créer un projet Firebase
 
@@ -51,11 +51,11 @@ Guide complet pour configurer l'authentification Firebase JWT dans votre backend
 2. Aller dans l'onglet **"Comptes de service"**
 3. Cliquer sur **"Générer une nouvelle clé privée"**
 4. Un fichier JSON sera téléchargé (ex: `projetls-firebase-adminsdk.json`)
-5. **⚠️ IMPORTANT** : Ne jamais commit ce fichier sur Git !
+5. **IMPORTANT** : Ne jamais commit ce fichier sur Git
 
 ---
 
-## ⚙️ Configuration Backend
+## Configuration Backend
 
 ### Méthode 1 : Fichier Service Account (Recommandé pour développement)
 
@@ -63,7 +63,7 @@ Guide complet pour configurer l'authentification Firebase JWT dans votre backend
    ```bash
    backend/
    └── config/
-       └── firebase-service-account.json  # ⚠️ À ajouter dans .gitignore
+       └── firebase-service-account.json  # À ajouter dans .gitignore
    ```
 
 2. **Ajouter dans `.gitignore`** :
@@ -90,11 +90,11 @@ FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@votre-projet.iam.gserviceaccount.c
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nVOTRE_CLE_PRIVEE\n-----END PRIVATE KEY-----\n"
 ```
 
-**⚠️ Important** : La clé privée doit conserver les `\n` pour les retours à la ligne.
+**Important** : La clé privée doit conserver les `\n` pour les retours à la ligne.
 
 ---
 
-## 🚀 Utilisation
+## Utilisation
 
 ### Routes publiques vs protégées
 
@@ -136,7 +136,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ---
 
-## 🛠️ Middlewares disponibles
+## Middlewares disponibles
 
 ### 1. `authenticateFirebase` (Authentification obligatoire)
 
@@ -156,9 +156,9 @@ app.use(authenticateFirebase);
 ```
 
 **Réponses** :
-- ✅ **200** : Token valide, `req.user` disponible
-- ❌ **401** : Token manquant
-- ❌ **403** : Token invalide/expiré
+- **200** : Token valide, `req.user` disponible
+- **401** : Token manquant
+- **403** : Token invalide/expiré
 
 ### 2. `optionalFirebaseAuth` (Authentification optionnelle)
 
@@ -211,7 +211,7 @@ router.delete('/users/:id',
 
 ---
 
-## 💡 Exemples d'utilisation
+## Exemples d'utilisation
 
 ### Exemple 1 : Route protégée simple
 
@@ -289,7 +289,7 @@ router.get('/annonces',
 
 ---
 
-## 🧪 Tests
+## Tests
 
 ### Tester avec curl
 
@@ -326,7 +326,7 @@ jest.mock('../config/firebase', () => ({
 
 ---
 
-## 🔒 Sécurité
+## Sécurité
 
 ### Custom Claims (Rôles personnalisés)
 
@@ -338,7 +338,7 @@ import { auth } from './config/firebase.js';
 
 async function setAdminRole(uid: string) {
     await auth.setCustomUserClaims(uid, { role: 'admin' });
-    console.log(`✅ Rôle admin ajouté pour ${uid}`);
+    console.log(`Rôle admin ajouté pour ${uid}`);
 }
 
 setAdminRole('USER_UID_HERE');
@@ -353,7 +353,7 @@ await auth.revokeRefreshTokens(uid);
 
 ---
 
-## 🐛 Dépannage
+## Dépannage
 
 ### Erreur : "Firebase non configuré"
 
@@ -404,7 +404,7 @@ if (!process.env.FIREBASE_PROJECT_ID) {
 
 ---
 
-## 📊 Architecture de sécurité
+## Architecture de sécurité
 
 ```
 ┌─────────────┐
@@ -448,7 +448,7 @@ if (!process.env.FIREBASE_PROJECT_ID) {
 
 ---
 
-## 📚 Ressources
+## Ressources
 
 - [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup)
 - [Firebase Authentication](https://firebase.google.com/docs/auth)
@@ -457,7 +457,7 @@ if (!process.env.FIREBASE_PROJECT_ID) {
 
 ---
 
-## ✅ Checklist de déploiement
+## Checklist de déploiement
 
 Production :
 - [ ] Créer projet Firebase
@@ -472,7 +472,11 @@ Production :
 
 ---
 
-**🎉 Votre backend est maintenant sécurisé avec Firebase Authentication !**
+**Le backend est sécurisé avec Firebase Authentication.**
+
+
+
+
 
 
 
