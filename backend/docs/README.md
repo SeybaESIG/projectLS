@@ -30,15 +30,5 @@ Documentation visible sur GitHub et utile pour les développeurs :
 
 ### `docs/local/` - Notes de développement
 
-Documentation interne non commitée sur GitHub :
-
-- **GUIDE_PEDAGOGIQUE_COMPLET.md** - Guide pédagogique détaillé
-- **FINAL_SUMMARY.md** - Résumé final de session
-- **IMPLEMENTATION_SUMMARY.md** - Résumé d'implémentation
-- **SECURITY_IMPLEMENTATION_SUMMARY.md** - Résumé sécurité
-- **FIREBASE_IMPLEMENTATION_SUMMARY.md** - Résumé Firebase
-
----
-
 **Note** : `README.md` à la racine `backend/` reste le point d'entrée principal du projet.
 
