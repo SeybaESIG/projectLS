@@ -1,0 +1,154 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--body-bg);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/img/background.avif');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-gradient);
+  opacity: var(--page-overlay-opacity);
+  animation: pulse 10s ease-in-out infinite;
+  z-index: 2;
+}
+
+.pageContent {
+  flex: 1;
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(2px);
+}
+
+.main {
+  flex: 1;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(var(--space-12), 10vh, var(--space-20)) var(--space-4)
+           clamp(var(--space-10), 8vh, var(--space-16));
+  margin-top: clamp(4rem, 12vh, 5rem);
+  gap: clamp(var(--space-14), 9vw, var(--space-22));
+  transition: margin-top 200ms ease-out, gap 200ms ease-out, padding 200ms ease-out;
+}
+
+.mainHeaderHidden {
+  margin-top: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.showcase {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: var(--space-16) var(--space-3) var(--space-12);
+    margin-top: 80px;
+    align-items: flex-start;
+    padding-top: var(--space-8);
+  }
+
+  .container {
+    max-width: none;
+  }
+}
+
+@media (max-height: 800px) {
+  .main {
+    padding: var(--space-10) var(--space-4) var(--space-12);
+    align-items: flex-start;
+    padding-top: var(--space-6);
+  }
+}
+
+@media (max-height: 600px) {
+  .main {
+    padding: var(--space-6) var(--space-4) var(--space-8);
+    align-items: flex-start;
+    padding-top: var(--space-4);
+  }
+}
+
+@media (min-width: 768px) {
+  .main {
+    padding: clamp(var(--space-12), 10vh, var(--space-20)) var(--space-8)
+             clamp(var(--space-10), 8vh, var(--space-16));
+    margin-top: clamp(4rem, 12vh, 5rem);
+    grid-template-columns: minmax(0, 520px);
+    gap: clamp(var(--space-14), 8vw, var(--space-22));
+  }
+
+  .container {
+    max-width: 520px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main {
+    grid-template-columns: minmax(0, 520px) minmax(320px, 420px);
+    padding: clamp(var(--space-12), 10vh, var(--space-20)) var(--space-12)
+             clamp(var(--space-10), 8vh, var(--space-16));
+    gap: clamp(var(--space-16), 7vw, calc(var(--space-16) + var(--space-6)));
+    justify-content: center;
+  }
+
+  .showcase {
+    display: block;
+  }
+}
+
+@media (min-width: 1280px) {
+  .main {
+    padding: clamp(var(--space-12), 10vh, var(--space-20)) var(--space-16)
+             clamp(var(--space-10), 8vh, var(--space-16));
+    gap: clamp(var(--space-18), 6vw, calc(var(--space-18) + var(--space-6)));
+    grid-template-columns: minmax(0, 560px) minmax(360px, 420px);
+  }
+}
+
+@media (min-width: 1600px) {
+  .main {
+    grid-template-columns: minmax(0, 600px) minmax(400px, 460px);
+    gap: clamp(var(--space-20), 5.5vw, calc(var(--space-18) + var(--space-8)));
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page::after {
+    animation: none;
+  }
+}
+

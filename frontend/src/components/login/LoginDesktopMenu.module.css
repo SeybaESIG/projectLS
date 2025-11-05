@@ -1,0 +1,179 @@
+.desktopMenu {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 250ms ease;
+  display: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  opacity: 0;
+  transition: opacity 250ms ease;
+  border: none;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -110%);
+  width: min(100% - 3rem, 960px);
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+  padding: 2.5rem 3rem 3rem;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 32px 48px -28px rgba(15, 23, 42, 0.65);
+  transition: transform 300ms ease;
+  display: grid;
+  gap: 2.5rem;
+}
+
+.panelHeader {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.menuTitle {
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: center;
+}
+
+.closeButton {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 200ms ease, transform 200ms ease;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.links {
+  display: flex;
+  gap: clamp(1rem, 2vw, 2.5rem);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.link {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(248, 250, 252, 0.95);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.link:hover {
+  color: #e0f2fe;
+}
+
+.ctaSection {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+}
+
+.ctaText h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.3rem;
+  color: #ffffff;
+}
+
+.ctaText p {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.75);
+  font-size: 0.95rem;
+  max-width: none;
+  text-wrap: balance;
+}
+
+.ctaText {
+  text-align: left;
+}
+
+.storeButtons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+
+.storeButton {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.85);
+  color: #f8fafc;
+  font-weight: 600;
+  transition: transform 180ms ease, background 180ms ease;
+  white-space: nowrap;
+}
+
+.storeButton:hover {
+  transform: translateY(-2px);
+  background: rgba(15, 118, 110, 1);
+}
+
+.desktopMenu.open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.desktopMenu.open .overlay {
+  opacity: 1;
+}
+
+.desktopMenu.open .panel {
+  transform: translate(-50%, 0);
+}
+
+@media (max-width: 1023px) {
+  .desktopMenu {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktopMenu {
+    display: block;
+  }
+}
+
+@media (max-width: 1280px) {
+  .ctaSection {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    padding: 2rem 2.5rem 2.5rem;
+  }
+}

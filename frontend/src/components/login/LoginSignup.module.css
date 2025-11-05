@@ -1,0 +1,19 @@
+.signup {
+  margin-top: var(--space-6);
+  text-align: center;
+}
+
+.text {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--font-size-sm);
+}
+
+.link {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
+.link:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+

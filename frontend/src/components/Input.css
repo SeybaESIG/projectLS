@@ -1,0 +1,114 @@
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.input-container {
+  position: relative;
+  width: 100%;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-sizing: border-box;
+  background-color: rgba(255, 255, 255, 0.96);
+  color: var(--text-primary);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--primary-green);
+  box-shadow: var(--focus-ring);
+  background-color: #ffffff;
+}
+
+.input-field:disabled {
+  background-color: var(--gray-100);
+  cursor: not-allowed;
+}
+
+.input-field--error {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.18);
+}
+
+.input-helper,
+.input-error {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.input-helper {
+  color: var(--text-secondary);
+}
+
+.input-error {
+  color: #dc3545;
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--password-icon-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-icon--left {
+  left: 0.75rem;
+  pointer-events: none;
+}
+
+.input-icon--right {
+  right: 0.75rem;
+}
+
+.input-container--with-left-icon .input-field {
+  padding-left: 2.5rem;
+}
+
+.input-container--with-right-icon .input-field {
+  padding-right: 2.5rem;
+}
+
+.input-container--with-icon .input-icon {
+  color: var(--password-icon-color);
+}
+
+body[data-theme='dark'] .input-icon,
+[data-theme='dark'] .input-icon {
+  color: var(--password-icon-color);
+}
+
+body[data-theme='dark'] .input-label,
+[data-theme='dark'] .input-label {
+  color: var(--text-primary);
+}
+
+body[data-theme='dark'] .input-field,
+[data-theme='dark'] .input-field {
+  background-color: rgba(15, 23, 42, 0.75);
+  border-color: rgba(148, 163, 184, 0.35);
+  color: var(--text-primary);
+}
+
+body[data-theme='dark'] .input-field:focus,
+[data-theme='dark'] .input-field:focus {
+  background-color: rgba(15, 23, 42, 0.85);
+}
+

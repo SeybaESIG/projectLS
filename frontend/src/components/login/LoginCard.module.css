@@ -1,0 +1,35 @@
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  box-shadow: var(--card-glow);
+  border: 2px solid var(--card-border);
+  backdrop-filter: var(--glass-blur);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  color: var(--white);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 253, 97, 0.05));
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 480px) {
+  .card {
+    margin-top: var(--space-2);
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+  }
+}
+
